@@ -4,4 +4,4 @@
 # If you change this key, all old signed cookies will become invalid!
 # Make sure the secret is at least 30 characters and all random,
 # no regular words or you'll be exposed to dictionary attacks.
-TrendExplainer::Application.config.secret_token = '23fb1aeb4396f932bd080f40c00b0d1d511c85aa40ab0f5f98ab3717ddbb620029a3f1f429bf9890dbd42d5434dda543d444c64e8f58567f39f2d712f34e07ad'
+TrendExplainer::Application.config.secret_token = 'fd7730505e5f42d652b4eef9ccde3568605830c0d94646dd4914c2f80590fabdd3b50848edf14461340479fd1e9c52c5868f901c5e12180e2a6ed29d4ae0e597'
