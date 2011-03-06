@@ -1,3 +1,9 @@
+Notes on Installation
+=====================
+
+You need to install Nokogiri available at http://nokogiri.org/
+Do gem install nokogiri
+
 == Welcome to Rails
 
 Rails is a web-application framework that includes everything needed to create

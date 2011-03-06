@@ -1,4 +1,6 @@
 TrendExplainer::Application.routes.draw do
+  get "twitter_call/index"
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
