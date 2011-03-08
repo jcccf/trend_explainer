@@ -9,3 +9,10 @@
 
 <h1>Abstract</h1>
 <%= @abstract %>
+
+<h1>Bing Altered Query</h1>
+<%= @altered_query %>
+
+<% @results.each do |result| %>
+  <%= result %>  
+<% end%>
