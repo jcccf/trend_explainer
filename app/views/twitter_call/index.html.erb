@@ -7,12 +7,11 @@
 <h1>Current Trends</h1>
 <%= @trends %>
 
-<h1>Abstract</h1>
-<%= @abstract %>
-
-<h1>Bing Altered Query</h1>
-<%= @altered_query %>
-
 <% @results.each do |result| %>
-  <%= result %>  
+  <h3><%= result.trend %></h3>
+  <div style="margin-left: 50px">
+  <b>Bing:</b> <%= result.bing %><br />
+  <b>Altered Search Query:</b> <%= result.altered_query %><br />
+  <b>Wikipedia:</b> <%= result.wikipedia %>  
+  </div>
 <% end%>

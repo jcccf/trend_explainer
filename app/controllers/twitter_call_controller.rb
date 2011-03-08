@@ -1,6 +1,10 @@
 require 'open-uri'
 require 'nokogiri'
 
+class Result
+  attr_accessor :bing, :wikipedia, :altered_query, :trend
+end
+
 class TwitterCallController < ApplicationController
   def index
     
@@ -26,6 +30,9 @@ class TwitterCallController < ApplicationController
     
     @trends.each do |trend|
       
+      result = Result.new
+      result.trend = trend
+      
       # Search Bing and get back
       # - Description of top result
       # - Altered search query if there exists one
@@ -35,8 +42,8 @@ class TwitterCallController < ApplicationController
       search_top = search_xml.xpath("/sr:SearchResponse/web:Web/web:Results/web:WebResult/web:Description",search_ns).first.content
       search_altered_xpath = search_xml.xpath("/sr:SearchResponse/sr:Query/sr:AlteredQuery",search_ns)
       search_altered = search_altered_xpath.first ? search_altered_xpath.first.content : ""
-      @results << "Bing: " + search_top 
-      @results << "Altered Query: " + search_altered
+      result.bing = search_top 
+      result.altered_query = search_altered
       
       # Search Wikipedia and get back top search result if any
       db_query = search_altered == "" ? search_query : search_altered
@@ -44,8 +51,10 @@ class TwitterCallController < ApplicationController
       db_ns = {"xmlns:ss" => "http://opensearch.org/searchsuggest2"}
       db_abstract_xpath = db_xml.xpath("/ss:SearchSuggestion/ss:Section/ss:Item/ss:Description",db_ns)
       db_abstract = db_abstract_xpath.first ? db_abstract_xpath.first.content : ""
-      @results << "Wikipedia: " + db_abstract 
-
+      result.wikipedia = db_abstract 
+      
+      @results << result
+      
     end
     
     # Output XML
