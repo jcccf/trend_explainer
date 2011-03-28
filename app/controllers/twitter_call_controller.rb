@@ -1,3 +1,4 @@
+require 'cgi'
 require 'open-uri'
 require 'nokogiri'
 
@@ -7,7 +8,7 @@ end
 
 class TwitterCallController < ApplicationController
   def index
-    
+
     # Get the available locations from Twitter
     locations = {}
     avail_xml = Nokogiri::XML(open("http://api.twitter.com/1/trends/available.xml"))
@@ -17,7 +18,7 @@ class TwitterCallController < ApplicationController
       locations[woeid] = name
     end
     @locations = locations
-    
+
     # Get the trending topics and put them into an array
     trends = []
     twitter_xml = Nokogiri::XML(open("http://api.twitter.com/1/trends/1.xml"))
@@ -25,18 +26,19 @@ class TwitterCallController < ApplicationController
       trends << (t.content[0] == "#" ? t.content[1..-1] : t.content) # Remove hash
     end
     @trends = trends
-    
+    puts @trends
     @results = []
-    
+
     @trends.each do |trend|
-      
+      puts trend
       result = Result.new
       result.trend = trend
-      
+
       # Search Bing and get back
       # - Description of top result
       # - Altered search query if there exists one
       search_query = trend
+      #search_xml = Nokogiri::XML(open("http://api.search.live.net/xml.aspx?Appid=D922B026428E58D0B1B38C3CB94E227BF6B113BB&query=#{search_query}&sources=web"))
       search_xml = Nokogiri::XML(open("http://api.search.live.net/xml.aspx?Appid=D922B026428E58D0B1B38C3CB94E227BF6B113BB&query=#{CGI.escape(search_query)}&sources=web"))
       search_ns = {"xmlns:sr" => "http://schemas.microsoft.com/LiveSearch/2008/04/XML/element", "xmlns:web" => "http://schemas.microsoft.com/LiveSearch/2008/04/XML/web"}
       search_top = search_xml.xpath("/sr:SearchResponse/web:Web/web:Results/web:WebResult/web:Description",search_ns).first.content
@@ -44,19 +46,20 @@ class TwitterCallController < ApplicationController
       search_altered = search_altered_xpath.first ? search_altered_xpath.first.content : ""
       result.bing = search_top 
       result.altered_query = search_altered
-      
+
       # Search Wikipedia and get back top search result if any
       db_query = search_altered == "" ? search_query : search_altered
+      puts db_query
       db_xml = Nokogiri::XML(open("http://en.wikipedia.org/w/api.php?action=opensearch&search=#{CGI.escape(db_query)}&limit=2&namespace=0&format=xml"))
       db_ns = {"xmlns:ss" => "http://opensearch.org/searchsuggest2"}
       db_abstract_xpath = db_xml.xpath("/ss:SearchSuggestion/ss:Section/ss:Item/ss:Description",db_ns)
       db_abstract = db_abstract_xpath.first ? db_abstract_xpath.first.content : ""
       result.wikipedia = db_abstract 
-      
+
       @results << result
-      
+
     end
-    
+
     # Output XML
     @builder = Nokogiri::XML::Builder.new do |xml|
         xml.entry {
@@ -68,7 +71,7 @@ class TwitterCallController < ApplicationController
         }
     end
     #puts @builder.to_xml
-    
+
     # Old Stuff
     # # Get the abstract for Blankety Blank from DBPedia
     # db_xml = Nokogiri::XML(open("http://dbpedia.org/data/Blankety_Blank.rdf"))
@@ -76,7 +79,7 @@ class TwitterCallController < ApplicationController
     # #db_ns = db_xml.collect_namespaces()
     # db_ns = {"xmlns:rdf"=>"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "xmlns:rdfs"=>"http://www.w3.org/2000/01/rdf-schema#", "xmlns:dcterms"=>"http://purl.org/dc/terms/", "xmlns:dbpprop"=>"http://dbpedia.org/property/", "xmlns:dbpedia-owl"=>"http://dbpedia.org/ontology/", "xmlns:foaf"=>"http://xmlns.com/foaf/0.1/", "xmlns:n0pred"=>"http://dbpedia.org/ontology/Work/", "xmlns:owl"=>"http://www.w3.org/2002/07/owl#"}
     # @abstract = db_xml.xpath("//dbpedia-owl:abstract[@xml:lang='en']",db_ns).first.content
-    
+
   end
 
 end
