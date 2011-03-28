@@ -16,10 +16,11 @@ include "atom.rnc" {
 # A trendy element
 trendy = 
   element tr:trends {
+    attribute location { text }?,
     element tr:trend {
       attribute topic { text },
-      element bing:top_result { text }*,
-      element wiki:abstract { text }*
+      element bing:top_result { text }?,
+      element wiki:abstract { text }?
     }*
   }
 
