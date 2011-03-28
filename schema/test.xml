@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<entry xmlns="http://www.w3.org/2005/Atom">
+  <title>Test</title>
+  <content>
+    Hi!
+  </content>
+  <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
+  <updated>2003-12-13T18:30:02Z</updated>
+  
+  <trends xmlns="http://api.twitter.com">
+    <trend topic="Hello">
+      <top_result xmlns="http://www.bing.com">A top result</top_result>
+      <abstract xmlns="http://www.wikipedia.org">An abstract</abstract>
+    </trend>
+  </trends>
+  
+</entry>

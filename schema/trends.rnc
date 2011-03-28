@@ -1,0 +1,34 @@
+# Define namespaces
+namespace atom = "http://www.w3.org/2005/Atom"
+namespace xhtml = "http://www.w3.org/1999/xhtml"
+namespace s = "http://www.ascc.net/xml/schematron"
+namespace local = ""
+
+namespace tr = "http://api.twitter.com"
+namespace bing = "http://www.bing.com"
+namespace wiki = "http://www.wikipedia.org"
+
+# Include ATOM specification and redefine extension element
+include "atom.rnc" {
+  extensionElement = trendy
+}
+
+# A trendy element
+trendy = 
+  element tr:trends {
+    element tr:trend {
+      attribute topic { text },
+      element bing:top_result { text }*,
+      element wiki:abstract { text }*
+    }*
+  }
+
+# OLDER STUFF
+# atomInlineTrendContent =
+#   element atom:content {
+#       atomCommonAttributes,
+#       attribute type { "text/trendy" },
+#       trendy
+#    }
+# 
+# atomContent |= atomInlineTrendContent
