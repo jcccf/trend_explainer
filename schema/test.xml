@@ -1,5 +1,7 @@
 <?xml version="1.0" ?>
-<entry xmlns="http://www.w3.org/2005/Atom">
+<entry xmlns="http://www.w3.org/2005/Atom"
+  xmlns:tw="http://api.twitter.com"
+  xmlns:tr="http://my.superdupertren.ds">
   <title>Ye Olde Twitter Trends</title>
   <content>
     Hi!
@@ -7,15 +9,16 @@
   <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
   <updated>2003-12-13T18:30:02Z</updated>
   
-  <trends xmlns="http://api.twitter.com" location="Global">
-    <trend topic="Heran">
+  <tr:trends xmlns="http://api.twitter.com" location="Global">
+    <tw:trend topic="Heran">
       <top_result xmlns="http://www.bing.com">How far doth Heran runne? A cowarde maybe it seems.</top_result>
       <abstract xmlns="http://www.wikipedia.org">They said unto him, "Doth you hateth thee? Slay ye all!"</abstract>
-    </trend>
-    <trend topic="Lipton">
+      <tr:user_comment>This is pretty cool!</tr:user_comment
+    </tw:trend>
+    <tw:trend topic="Lipton">
       <top_result xmlns="http://www.bing.com">If a Lipton doth standeth on thy foot, it would be heavy indeed.</top_result>
       <abstract xmlns="http://www.wikipedia.org">Lipton became not but coveth none of thy wine.</abstract>
-    </trend>
-  </trends>
+    </tw:trend>
+  </tr:trends>
   
 </entry>

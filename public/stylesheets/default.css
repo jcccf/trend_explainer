@@ -1,0 +1,21 @@
+body {
+  font-family: Helvetica;
+  font-size: 14px;
+}
+
+#trends_block {
+  float: left;
+  width: 300px;
+  background-color: #EEEEEE;
+}
+
+#trends_block ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+#main_block {
+  margin-left: 310px;
+  
+}

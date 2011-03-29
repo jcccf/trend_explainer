@@ -4,9 +4,10 @@ namespace xhtml = "http://www.w3.org/1999/xhtml"
 namespace s = "http://www.ascc.net/xml/schematron"
 namespace local = ""
 
-namespace tr = "http://api.twitter.com"
+namespace tw = "http://api.twitter.com"
 namespace bing = "http://www.bing.com"
 namespace wiki = "http://www.wikipedia.org"
+namespace tr = "http://my.superdupertren.ds"
 
 # Include ATOM specification and redefine extension element
 include "atom.rnc" {
@@ -17,10 +18,11 @@ include "atom.rnc" {
 trendy = 
   element tr:trends {
     attribute location { text }?,
-    element tr:trend {
+    element tw:trend {
       attribute topic { text },
       element bing:top_result { text }?,
-      element wiki:abstract { text }?
+      element wiki:abstract { text }?,
+      element tr:user_comment { text }?
     }*
   }
 
