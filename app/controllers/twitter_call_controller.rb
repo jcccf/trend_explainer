@@ -1,6 +1,8 @@
 require 'cgi'
 require 'open-uri'
 require 'nokogiri'
+require 'net/http'
+require 'uri'
 
 class Result
   attr_accessor :bing, :wikipedia, :altered_query, :trend
@@ -80,6 +82,22 @@ class TwitterCallController < ApplicationController
     # db_ns = {"xmlns:rdf"=>"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "xmlns:rdfs"=>"http://www.w3.org/2000/01/rdf-schema#", "xmlns:dcterms"=>"http://purl.org/dc/terms/", "xmlns:dbpprop"=>"http://dbpedia.org/property/", "xmlns:dbpedia-owl"=>"http://dbpedia.org/ontology/", "xmlns:foaf"=>"http://xmlns.com/foaf/0.1/", "xmlns:n0pred"=>"http://dbpedia.org/ontology/Work/", "xmlns:owl"=>"http://www.w3.org/2002/07/owl#"}
     # @abstract = db_xml.xpath("//dbpedia-owl:abstract[@xml:lang='en']",db_ns).first.content
 
+  end
+
+  def get
+    url_str = "http://localhost:8080/exist/atom/introspect/4302Collection"
+    url = URI.parse(url_str)
+    req = Net::HTTP::Get.new(url.path)
+    res = Net::HTTP.start(url.host, url.port) {|http|
+      http.request(req)
+    }
+    puts res.body
+    render :xml => res.body
+
+  end
+
+  def post
+    #to be implemented soon
   end
 
 end
