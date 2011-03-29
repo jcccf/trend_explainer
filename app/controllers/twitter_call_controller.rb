@@ -1,6 +1,8 @@
 require 'cgi'
 require 'open-uri'
 require 'nokogiri'
+require 'net/http'
+require 'uri'
 
 class Result
   attr_accessor :bing, :wikipedia, :altered_query, :trend
@@ -40,8 +42,13 @@ class TwitterCallController < ApplicationController
       search_query = trend
       #search_xml = Nokogiri::XML(open("http://api.search.live.net/xml.aspx?Appid=D922B026428E58D0B1B38C3CB94E227BF6B113BB&query=#{search_query}&sources=web"))
       search_xml = Nokogiri::XML(open("http://api.search.live.net/xml.aspx?Appid=D922B026428E58D0B1B38C3CB94E227BF6B113BB&query=#{CGI.escape(search_query)}&sources=web"))
+      puts search_xml
       search_ns = {"xmlns:sr" => "http://schemas.microsoft.com/LiveSearch/2008/04/XML/element", "xmlns:web" => "http://schemas.microsoft.com/LiveSearch/2008/04/XML/web"}
-      search_top = search_xml.xpath("/sr:SearchResponse/web:Web/web:Results/web:WebResult/web:Description",search_ns).first.content
+      search_top_path = search_xml.xpath("/sr:SearchResponse/web:Web/web:Results/web:WebResult/web:Description",search_ns).first
+      if not search_top_path
+        next
+      end
+      search_top = search_top_path.content
       search_altered_xpath = search_xml.xpath("/sr:SearchResponse/sr:Query/sr:AlteredQuery",search_ns)
       search_altered = search_altered_xpath.first ? search_altered_xpath.first.content : ""
       result.bing = search_top 
@@ -80,6 +87,30 @@ class TwitterCallController < ApplicationController
     # db_ns = {"xmlns:rdf"=>"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "xmlns:rdfs"=>"http://www.w3.org/2000/01/rdf-schema#", "xmlns:dcterms"=>"http://purl.org/dc/terms/", "xmlns:dbpprop"=>"http://dbpedia.org/property/", "xmlns:dbpedia-owl"=>"http://dbpedia.org/ontology/", "xmlns:foaf"=>"http://xmlns.com/foaf/0.1/", "xmlns:n0pred"=>"http://dbpedia.org/ontology/Work/", "xmlns:owl"=>"http://www.w3.org/2002/07/owl#"}
     # @abstract = db_xml.xpath("//dbpedia-owl:abstract[@xml:lang='en']",db_ns).first.content
 
+  end
+
+  def get
+    url_str = "http://localhost:8080/exist/atom/introspect/4302Collection"
+    url = URI.parse(url_str)
+    req = Net::HTTP::Get.new(url.path)
+    res = Net::HTTP.start(url.host, url.port) {|http|
+      http.request(req)
+    }
+    puts res.body
+    render :xml => res.body
+
+  end
+
+  def post
+    url_str = "http://localhost:8080/exist/atom/edit/4302Collection"
+    url = URI.parse(url_str)
+    request = Net::HTTP::Post.new(url.path)
+    xml_str = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>trend_explaner</title></feed>'
+    puts "url string initiated"
+    request.body = xml_str
+    res = Net::HTTP.start(url.host, url.port) {|http| http.request(request)}
+    puts res.body
+    render :text => "OK"
   end
 
 end

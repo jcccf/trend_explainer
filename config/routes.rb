@@ -2,6 +2,8 @@ TrendExplainer::Application.routes.draw do
   get "face/index"
 
   get "twitter_call/index"
+  get "twitter_call/get"
+  get "twitter_call/post"
   #match 'twitter_call/index' => 'twitter_call#index'
 
   # The priority is based upon order of creation:
