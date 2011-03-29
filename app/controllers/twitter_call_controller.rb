@@ -69,11 +69,23 @@ class TwitterCallController < ApplicationController
 
     # Output XML
     @builder = Nokogiri::XML::Builder.new do |xml|
-        xml.entry {
-          xml.parent.default_namespace = "http://www.w3.org/2005/Atom"
-          xml.title "Radio Head"
-          xml.content("type"=>"xhtml") {
+        xml.entry(:xmlns => "http://www.w3.org/2005/Atom") {
+          xml.title = "Location and time of query (TODO)"
+          xml.content(:type => "xhtml") {
             xml.parent.content = "Hello"
+          }
+
+          xml.trends(:xmlns => "http://api.twitter.com", :location => "test") {           
+            trends.each_with_index do |t,i|
+              xml.trend(:topic => t) {
+                xml.top_result(:xmlns => "http://www.bing.com") {
+                  xml.parent.content = result.bing[i]
+                }
+                xml.abstract(:xmlns => "http://www.wikipedia.org") {
+                  xml.parent.content = result.wikipedia[i]
+                }
+              }
+            end
           }
         }
     end
