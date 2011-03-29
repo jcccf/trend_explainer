@@ -10,6 +10,25 @@ $(document).ready(function(){
   // Review Past Trends
   
   // Update Trend
+  alert("Hi!");
+  
+  $.ajax({
+  		url: '/xslt/test.xml',
+  		dataType: 'html',
+  		success: function(data) {
+  			$('#xmldata').text(data);
+  		}
+  	});
+
+  	$.ajax({
+  		url: '/xslt/entry.xsl',
+  		dataType: 'html',
+  		success: function(data) {
+  			$('#xsldata').text(data);
+  		}
+  	});
+  
+  $("#main_block").xslt({xmlUrl: '/xslt/test.xml', xslUrl: '/xslt/entry.xsl'});
 });
 </script>
 <h1>Ye Olde Trend Explainer</h1>
@@ -25,4 +44,6 @@ $(document).ready(function(){
 <div id="main_block">
   This is the main block and it's much much bigger and you can write a lot more here.
 </div>
+<div id="xmldata"></div>
+<div id="xsldata"></div>
 </div>
