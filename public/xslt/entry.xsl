@@ -11,21 +11,7 @@
     
     <!--Base-->
     <xsl:template match="/">
-        <!-- Workaround to set DOCTYPE to HTML5 -->
-        <xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html&gt;</xsl:text>
-        <html>
-            <head>
-                <title>Trendy Trend Explainer Thingy</title>
-                <style>
-                    body { font-family: Helvetica; }
-                    div.trend { background-color: #EEEEEE; margin: 5px 0px; padding: 5px; }
-                    h1 { font-family: "Palatino Linotype"; font-style: italic; text-align: center; font-size: xx-large; }
-                </style>
-            </head>
-            <body>
-                <xsl:apply-templates select="a:entry" />
-            </body>
-        </html>
+        <xsl:apply-templates select="a:entry" />
     </xsl:template>
     
     <!--Parse Atom entry-->
@@ -47,7 +33,7 @@
         <h2><xsl:value-of select="@topic"/></h2>
         <b>Bing says:</b><xsl:value-of select="bi:top_result" /><br />
         <b>Wikipedia says:</b><xsl:value-of select="wi:abstract" /><br />
-        <b>You say:</b><xsl:value-of select="tr:user_comment" />
+        <div class="user_power"><b>You say:</b><span class="user_comment"><xsl:value-of select="tr:user_comment" /></span></div>
         </div>
     </xsl:template>
     

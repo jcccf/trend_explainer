@@ -9,7 +9,7 @@
   <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
   <updated>2003-12-13T18:30:02Z</updated>
   
-  <tr:trends location="Global">
+  <tr:trends xmlns="http://api.twitter.com" location="Global">
     <tw:trend topic="Heran">
       <top_result xmlns="http://www.bing.com">How far doth Heran runne? A cowarde maybe it seems.</top_result>
       <abstract xmlns="http://www.wikipedia.org">They said unto him, "Doth you hateth thee? Slay ye all!"</abstract>
