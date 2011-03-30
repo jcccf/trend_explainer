@@ -70,23 +70,11 @@ class TwitterCallController < ApplicationController
 
     # Output XML
     @builder = Nokogiri::XML::Builder.new do |xml|
-        xml.entry(:xmlns => "http://www.w3.org/2005/Atom") {
-          xml.title = "Location and time of query (TODO)"
-          xml.content(:type => "xhtml") {
+        xml.entry {
+          xml.parent.default_namespace = "http://www.w3.org/2005/Atom"
+          xml.title "Radio Head"
+          xml.content("type"=>"xhtml") {
             xml.parent.content = "Hello"
-          }
-
-          xml.trends(:xmlns => "http://my.superdupertren.ds", :location => "test") {           
-            trends.each_with_index do |t,i|
-              xml.trend(:xmlns => "http://api.twitter.com", :topic => t) {
-                xml.top_result(:xmlns => "http://www.bing.com") {
-                  xml.parent.content = result.bing[i]
-                }
-                xml.abstract(:xmlns => "http://www.wikipedia.org") {
-                  xml.parent.content = result.wikipedia[i]
-                }
-              }
-            end
           }
         }
     end
@@ -103,44 +91,19 @@ class TwitterCallController < ApplicationController
   end
 
   def get
-    url_str = "http://localhost:8080/exist/atom/introspect/4302Collection/root-trends"
+    url_str = "http://localhost:8080/exist/atom/introspect/4302Collection/"
     res = RestClient.get url_str
-    render :xml => res
-    #return res.body
+    render :xml => res.body
+
   end
 
-  def get_all
-    xml_res = get()
-    return xml_res
-  end
-
-  def get_latest
-    xml_res = get()
-    #TODO: need to get the latest
-  end
-
-  def post_entry(entry_xml)
-    url= "http://localhost:8080"
-    r = RestClient::Resource.new url
-    r["exist/atom/edit/4302Collection/root-trends"].post entry_xml, :content_type => "application/atom+xml"
-    puts r.to_s
-    return r.to_s
-  end
-
-  def post
-    xml = '<?xml version="1.0" ?><entry xmlns="http://www.w3.org/2005/Atom"><title>Hello Horse</title><content><p>hello horse is alpaca</p></content></entry>'
-    res = post_entry(xml)
-    render :xml => res
-  end
-
-  def put
-    feed_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>rrrrrrrrrrr trends</title><author><name>Justin-Paul-Steven</name></author></feed>'
-    url= "http://localhost:8080"
-    r = RestClient::Resource.new url
-    r["exist/atom/edit/4302Collection/fffffffffffff"].put feed_setup, :content_type => "application/atom+xml"
-    puts r.to_s
-
-    render :text => r.to_s
+  def post_f
+    feed_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>Root trends</title><author><name>Justin-Paul-Steven</name></author></feed>'
+    url= "/exist/atom/edit/4302Collection/root-trends"
+    url_str = "localhost:8080/exist/atom/edit/4302Collection/root-trends"
+    res = Net::HTTP.post_form(URI.parse(url_str), feed_setup,
+                          {'content-type' => 'text/xml'})
+    puts res.body
   end
 
   def post_collection
@@ -162,8 +125,28 @@ class TwitterCallController < ApplicationController
   def post_collection_feed
     post_collection()
     post_feed()
+    return
   end
 
+  def post_entry(entry_xml)
+    url= "http://localhost:8080"
+    r = RestClient::Resource.new url
+    r["exist/atom/edit/4302Collection/root-trends"].post entry_xml, :content_type => "application/atom+xml"
+    puts r.to_s
+  end
+
+
+  def put
+    feed_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>rrrrrrrrrrr trends</title><author><name>Justin-Paul-Steven</name></author></feed>'
+    url= "http://localhost:8080"
+    r = RestClient::Resource.new url
+    #res = RestClient.post url, collection_setup, :content_type => "text/xml"
+    r["exist/atom/edit/4302Collection/fffffffffffff"].put feed_setup, :content_type => "application/atom+xml"
+    puts r.to_s
+    #return res.body
+
+    render :text => r.to_s
+  end
 
 
 

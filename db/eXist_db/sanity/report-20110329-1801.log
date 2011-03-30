@@ -1,0 +1,34 @@
+COLLECTION: /db
+COLLECTION: /db/system
+COLLECTION: /db/system/config
+COLLECTION: /db/system/config/db
+COLLECTION: /db/system/config/db/shakespeare
+COLLECTION: /db/system/config/db/mondial
+COLLECTION: /db/system/config/db/mods
+COLLECTION: /db/system/config/db/xmlad
+COLLECTION: /db/library
+COLLECTION: /db/xmlad
+COLLECTION: /db/todo
+COLLECTION: /db/xproc
+COLLECTION: /db/xproc/unit-test
+COLLECTION: /db/xproc/result
+COLLECTION: /db/xproc/xslt
+COLLECTION: /db/xproc/pipelines
+COLLECTION: /db/xproc/xml
+COLLECTION: /db/xproc/examples
+COLLECTION: /db/xinclude
+COLLECTION: /db/xinclude/styles
+COLLECTION: /db/xinclude/scripts
+COLLECTION: /db/xinclude/scripts/syntax
+COLLECTION: /db/4302Collection
+COLLECTION: /db/4302Collection/carllagoze
+COLLECTION: /db/4302Collection/.feed.entry
+COLLECTION: /db/mods
+COLLECTION: /db/shakespeare
+COLLECTION: /db/shakespeare/plays
+COLLECTION: /db/twitter
+----------------------------------------------
+ERR_NODE_HIERARCHY:
+Node 1.3.1 is not a child of 1
+Document ID: 118
+  DOCUMENT: 146 of 146

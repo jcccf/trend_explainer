@@ -6,8 +6,11 @@ gem 'rails', '3.0.5'
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 gem 'sqlite3'
+<<<<<<< HEAD
 gem 'rest-client'
+=======
 gem 'jquery-rails', '>= 0.2.6'
+>>>>>>> ee6a1f8b6c2c4fb247bbe64be75a8e06d904a89e
 
 # Use unicorn as the web server
 # gem 'unicorn'
