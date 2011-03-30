@@ -75,9 +75,9 @@ class TwitterCallController < ApplicationController
             xml.parent.content = "Hello"
           }
 
-          xml.trends(:xmlns => "http://api.twitter.com", :location => "test") {           
+          xml.trends(:xmlns => "http://my.superdupertren.ds", :location => "test") {           
             trends.each_with_index do |t,i|
-              xml.trend(:topic => t) {
+              xml.trend(:xmlns => "http://api.twitter.com", :topic => t) {
                 xml.top_result(:xmlns => "http://www.bing.com") {
                   xml.parent.content = result.bing[i]
                 }
