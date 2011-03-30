@@ -3,6 +3,7 @@ require 'open-uri'
 require 'nokogiri'
 require 'net/http'
 require 'uri'
+require 'rest_client'
 
 class Result
   attr_accessor :bing, :wikipedia, :altered_query, :trend
@@ -90,27 +91,68 @@ class TwitterCallController < ApplicationController
   end
 
   def get
-    url_str = "http://localhost:8080/exist/atom/introspect/4302Collection"
-    url = URI.parse(url_str)
-    req = Net::HTTP::Get.new(url.path)
-    res = Net::HTTP.start(url.host, url.port) {|http|
-      http.request(req)
-    }
-    puts res.body
-    render :xml => res.body
+    url_str = "http://localhost:8080/exist/atom/introspect/4302Collection/root-trends"
+    res = RestClient.get url_str
+    render :xml => res
+    #return res.body
+  end
 
+  def get_all
+    xml_res = get()
+    return xml_res
+  end
+
+  def get_latest
+    xml_res = get()
+    #TODO: need to get the latest
+  end
+
+  def post_entry(entry_xml)
+    url= "http://localhost:8080"
+    r = RestClient::Resource.new url
+    r["exist/atom/edit/4302Collection/root-trends"].post entry_xml, :content_type => "application/atom+xml"
+    puts r.to_s
+    return r.to_s
   end
 
   def post
-    url_str = "http://localhost:8080/exist/atom/edit/4302Collection"
-    url = URI.parse(url_str)
-    request = Net::HTTP::Post.new(url.path)
-    xml_str = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>trend_explaner</title></feed>'
-    puts "url string initiated"
-    request.body = xml_str
-    res = Net::HTTP.start(url.host, url.port) {|http| http.request(request)}
-    puts res.body
-    render :text => "OK"
+    xml = '<?xml version="1.0" ?><entry xmlns="http://www.w3.org/2005/Atom"><title>Hello Horse</title><content><p>hello horse is alpaca</p></content></entry>'
+    res = post_entry(xml)
+    render :xml => res
   end
+
+  def put
+    feed_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>rrrrrrrrrrr trends</title><author><name>Justin-Paul-Steven</name></author></feed>'
+    url= "http://localhost:8080"
+    r = RestClient::Resource.new url
+    r["exist/atom/edit/4302Collection/fffffffffffff"].put feed_setup, :content_type => "application/atom+xml"
+    puts r.to_s
+
+    render :text => r.to_s
+  end
+
+  def post_collection
+    collection_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>Trend Explainer</title></feed>'
+    url= "http://localhost:8080/exist/atom/edit/4302Collection"
+    r = RestClient::Resource.new url
+    r.post collection_setup, :content_type => "application/atom+xml"
+  end
+
+  def post_feed
+    feed_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>Root trends</title><author><name>Justin-Paul-Steven</name></author></feed>'
+    url= "http://localhost:8080"
+    r = RestClient::Resource.new url
+    r["exist/atom/edit/4302Collection/root-trends"].post feed_setup, :content_type => "application/atom+xml"
+    puts r.to_s
+  end
+
+  #this function should only be called once for setting up collections and feeds
+  def post_collection_feed
+    post_collection()
+    post_feed()
+  end
+
+
+
 
 end
