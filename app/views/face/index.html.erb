@@ -3,47 +3,114 @@
 // $.post("/tasks/1",{_method: "PUT",authenticity_token: encodeURIComponent
 // (window._token)});
 
-$(document).ready(function(){
-  
-  // Get Latest Trends
-  
-  // Review Past Trends
-  
-  // Update Trend
-  alert("Hi!");
-  
-  $.ajax({
-  		url: '/xslt/test.xml',
-  		dataType: 'html',
-  		success: function(data) {
-  			$('#xmldata').text(data);
-  		}
-  	});
+var trends_id, original_topic;
 
-  	$.ajax({
-  		url: '/xslt/entry.xsl',
-  		dataType: 'html',
-  		success: function(data) {
-  			$('#xsldata').text(data);
-  		}
-  	});
+$(function(){
+  $('#loading_div')
+      .hide()
+      .ajaxStart(function() { $(this).show(); })
+      .ajaxStop(function() { $(this).hide(); });
+      
+  $('#trends_list li a').live('click', function(){
+    get_trend($(this).attr("href").substring(1));
+  });
+      
+  $('.user_power').live('click', function(){
+    var original_text = $('.user_comment',this).html();
+    original_topic = $('h2',$(this).parent()).html();
+    $("#comment").val(original_text);
+    $("#dialog-form").dialog({ title: "Modifying comment for "+original_topic }).dialog("open");
+  });
   
-  $("#main_block").xslt({xmlUrl: '/xslt/test.xml', xslUrl: '/xslt/entry.xsl'});
+  $( "#dialog-form" ).dialog({
+  			autoOpen: false,
+  			height: 200,
+  			width: 500,
+  			modal: true,
+  			buttons: {
+  				"Edit comment": function() {
+  				  var new_text = $("#comment").val();
+  				  update_trend(original_topic, new_text);
+  					$( this ).dialog( "close" );
+  				},
+  				Cancel: function() {
+  					$( this ).dialog( "close" );
+  				}
+  			},
+  			close: function() {
+
+  			}
+  		});
+  		$("#dialog-form").hide();
+  
+  var xml = "";
+  var xsl = "";
+  $.ajax({ url: '/xslt/test.xml', dataType: 'xml', success: function(data) {
+  		xml = data;
+  		$.ajax({ url: '/xslt/entry.xsl', dataType: 'xml', success: function(data) {
+    			xsl = data;
+    			xsltProcessor=new XSLTProcessor();
+          xsltProcessor.importStylesheet(xsl);
+          resultDocument = xsltProcessor.transformToFragment(xml,document);
+          $("#main_block").html("").append(resultDocument);
+    		}
+      });
+  	}
+  });
+  
+  get_trends_ids();
+  // TODO Fetch latest trends
 });
+
+function get_trends_ids(){
+  /*$.get("SOMEURL", function(data){
+    $("ul").html("");
+    $.each(data, function(index,value) {
+      $("ul").append("<li><a href=\"#"+SOMEID+"\">"+SOMEID+"</a></li>");
+    });
+  },"json");*/
+}
+
+function get_trend(trend_id){
+  alert(trend_id);
+  /*$.get("SOMEURL", function(data){
+    xsltProcessor.importStylesheet(xsl);
+    resultDocument = xsltProcessor.transformToFragment(data,document);
+    $("#main_block").html("").append(resultDocument);
+  },"xml");*/
+}
+
+function update_trend(original_topic, updated_text){
+  alert("Original topic was " + original_topic + "\nUpdated text was " + updated_text);
+  /*$.post("SOMEURL", {}, function(data){
+    alert("Success? - "+ data);
+  });*/
+}
+
 </script>
 <h1>Ye Olde Trend Explainer</h1>
 
 <div>
 <div id="trends_block">
   <h2>Select ye trends</h2>
-  <ul>
+  <ul id="trends_list">
     <li><a href="#id1">Some ID1</a></li>
     <li><a href="#id2">Some other ID2</a></li>
   </ul>
 </div>
 <div id="main_block">
-  This is the main block and it's much much bigger and you can write a lot more here.
+  Loading...please hold on...watch the pretty spinner!
 </div>
-<div id="xmldata"></div>
-<div id="xsldata"></div>
+
+<!--Utility Divs-->
+<div id="dialog-form" title="Create new user">
+	<form>
+	<textarea name="comment" id="comment" class="text ui-widget-content ui-corner-all" />
+	</form>
+</div>
+
+
+<div id="loading_div">
+</div>
+
 </div>

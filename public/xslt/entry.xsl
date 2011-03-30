@@ -33,7 +33,7 @@
         <h2><xsl:value-of select="@topic"/></h2>
         <b>Bing says:</b><xsl:value-of select="bi:top_result" /><br />
         <b>Wikipedia says:</b><xsl:value-of select="wi:abstract" /><br />
-        <b>You say:</b><xsl:value-of select="tr:user_comment" />
+        <div class="user_power"><b>You say:</b><span class="user_comment"><xsl:value-of select="tr:user_comment" /></span></div>
         </div>
     </xsl:template>
     

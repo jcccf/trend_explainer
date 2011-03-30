@@ -17,5 +17,37 @@ body {
 
 #main_block {
   margin-left: 310px;
-  
+}
+
+#loading_div{
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: url(../images/loading.gif) fixed center no-repeat;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  opacity: 0.5;
+}
+
+div.trend{
+  padding-bottom: 20px;
+}
+
+div.user_power{
+  background-color: #DDDDDD;
+  padding: 5px;
+  margin: 5px;
+  border-radius: 5px;
+  box-shadow: 1px 1px 1px rgba(0,0,0, 0.5);
+}
+
+div.user_power:hover{
+  background-color: #FFD000;
+  cursor: pointer;
+}
+
+textarea{
+  width: 450px;
+  height: 75px;
 }
