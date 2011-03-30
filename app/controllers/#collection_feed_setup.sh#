@@ -1,0 +1,2 @@
+
+curl -v -k --request POST --header "Content-type: application/atom+xml" --data @trendexplainer_feed.xml http://localhost:8080/exist/atom/edit/4302Collection/root-trends
