@@ -11,9 +11,13 @@ $(function(){
       .ajaxStart(function() { $(this).show(); })
       .ajaxStop(function() { $(this).hide(); });
       
-  $('#trends_list li a').live('click', function(){
-    get_trend($(this).attr("href").substring(1));
-  });
+  // $('#trends_list li a').live('click', function(){
+  //   event.preventDefault();
+  //   var link = this;
+  //   $.smoothScroll({
+  //     scrollTarget: link.hash
+  //   });
+  // });
       
   $('.user_power').live('click', function(){
     var original_text = $('.user_comment',this).html();
@@ -45,30 +49,34 @@ $(function(){
   
   var xml = "";
   var xsl = "";
-  $.ajax({ url: '/xslt/test.xml', dataType: 'xml', success: function(data) {
+  $.ajax({ url: '/xslt/test2.xml', dataType: 'text', success: function(data) {
   		xml = data;
-  		$.ajax({ url: '/xslt/entry.xsl', dataType: 'xml', success: function(data) {
+  		$.ajax({ url: '/xslt/feed.xsl', dataType: 'xml', success: function(data) {
     			xsl = data;
+    			// Convert Text into XML
+    			parser=new DOMParser();
+          xmlDoc=parser.parseFromString(xml,"text/xml");
+    			// Transform XML using XSLT
     			xsltProcessor=new XSLTProcessor();
           xsltProcessor.importStylesheet(xsl);
-          resultDocument = xsltProcessor.transformToFragment(xml,document);
+          resultDocument = xsltProcessor.transformToFragment(xmlDoc,document);
           $("#main_block").html("").append(resultDocument);
+          build_trends_navigation();
     		}
       });
   	}
   });
   
-  get_trends_ids();
   // TODO Fetch latest trends
 });
 
-function get_trends_ids(){
-  /*$.get("SOMEURL", function(data){
-    $("ul").html("");
-    $.each(data, function(index,value) {
-      $("ul").append("<li><a href=\"#"+SOMEID+"\">"+SOMEID+"</a></li>");
-    });
-  },"json");*/
+function build_trends_navigation(){
+  $("ul").html("");
+  $("div form input[type=hidden][name=entries_id]").each(function(index){
+    my_id = $(this).attr("value");
+    $("ul").append("<li><a href=\"#"+my_id+"\">"+my_id+"</a></li>"); 
+  });
+  $('#trends_list li a').smoothScroll();
 }
 
 function get_trend(trend_id){
@@ -88,10 +96,19 @@ function update_trend(original_topic, updated_text){
 }
 
 </script>
-<h1>Ye Olde Trend Explainer</h1>
 
-<div>
+<div id="container">
 <div id="trends_block">
+  <div style="text-align: center">
+  <form>
+  <select name="location">
+    <option value="0">Global</option>
+    <option value="123">San Francisco</option>
+  </select>
+  <input type="button" value="Hear ye!" />
+  </form>
+  </div>
+  
   <h2>Select ye trends</h2>
   <ul id="trends_list">
     <li><a href="#id1">Some ID1</a></li>

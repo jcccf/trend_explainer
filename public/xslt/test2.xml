@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom" xmlns:tw="http://api.twitter.com"
+    xmlns:tr="http://my.superdupertren.ds">
+
+    <entry>
+        <title>Ye Olde Twitter Trends</title>
+        <content> Hi! </content>
+        <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
+        <updated>2003-12-13T18:30:02Z</updated>
+        <link rel="edit" href="http://www.googleeditsyou.com" />
+
+        <tr:trends xmlns="http://api.twitter.com" location="Global">
+            <tw:trend topic="Heran">
+                <top_result xmlns="http://www.bing.com">How far doth Heran runne? A cowarde maybe it
+                    seems.</top_result>
+                <abstract xmlns="http://www.wikipedia.org">They said unto him, "Doth you hateth
+                    thee? Slay ye all!"</abstract>
+                <tr:user_comment>This is pretty cool!</tr:user_comment>
+            </tw:trend>
+            <tw:trend topic="Lipton">
+                <top_result xmlns="http://www.bing.com">If a Lipton doth standeth on thy foot, it
+                    would be heavy indeed.</top_result>
+                <abstract xmlns="http://www.wikipedia.org">Lipton became not but coveth none of thy
+                    wine.</abstract>
+            </tw:trend>
+        </tr:trends>
+    </entry>
+    
+    <entry>
+        <title>Ye Older Twitter Trends</title>
+        <content> Hiya! </content>
+        <id>urn:uuid:1337c695-cfb8-4ebb-aaaa-80da344eda6a</id>
+        <updated>2003-12-13T18:30:02Z</updated>
+        
+        <tr:trends xmlns="http://api.twitter.com" location="Global">
+            <tw:trend topic="Heran">
+                <top_result xmlns="http://www.bing.com">How far doth Heran runne? A stick for ye all to mark ye </top_result>
+                <abstract xmlns="http://www.wikipedia.org">They said unto him, "Doth you hateth
+                    thee? Slay ye all!"</abstract>
+                <tr:user_comment>This is pretty cool!</tr:user_comment>
+            </tw:trend>
+            <tw:trend topic="Lipton">
+                <top_result xmlns="http://www.bing.com">If a Lipton doth standeth on thy foot, it
+                    would be heavy indeed.</top_result>
+                <abstract xmlns="http://www.wikipedia.org">Lipton became not but coveth none of thy
+                    wine.</abstract>
+            </tw:trend>
+        </tr:trends>
+    </entry>
+</feed>
