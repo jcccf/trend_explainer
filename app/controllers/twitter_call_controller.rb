@@ -125,6 +125,46 @@ class TwitterCallController < ApplicationController
   
   def update
     # Given the ID and Trend_Name and Comment Text, update
+    uuid = params[:uuid]
+    topic = params[:topic]
+    comment = params[:comment]
+
+    # to change later
+    uuid = "91de7ee4-1cde-4aa8-9d0e-e16f46236d2f"
+    comment = "this is awesome111111!"
+    topic = "soytanrudo"
+
+    url= "http://localhost:8080"
+    get_str = "exist/atom/content/4302Collection/root-trends/?id=urn:uuid:%s"%uuid
+    r = RestClient::Resource.new url
+    res = r[get_str].get
+    puts res
+
+    atom_string = res
+    user_comment = comment
+
+    atom_xml = Nokogiri::XML(atom_string)
+
+    # assume the item exists and that there's only one of them
+    topic_node = atom_xml.xpath("//tw:trend[@topic='"+topic+"']", {"tw" => "http://api.twitter.com"})[0]
+
+    # Create new node and add
+    new_node = Nokogiri::XML::Node.new("user_comment", atom_xml)
+    new_node.add_namespace(nil,"http://my.superdupertren.ds")
+    new_node.content = user_comment
+    topic_node.add_child(new_node)
+
+    #update entry
+    puts atom_xml.to_xml
+
+    url= "http://localhost:8080"
+    r = RestClient::Resource.new url
+    post_str = "exist/atom/edit/4302Collection/root-trends/?id=urn:uuid:%s" % uuid
+    res = r[post_str].put atom_xml.to_xml, :content_type => "application/atom+xml"
+
+    puts res
+    render :xml => res
+
   end
 
   def create
