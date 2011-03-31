@@ -1,14 +1,19 @@
 TrendExplainer::Application.routes.draw do
   get "face/index"
-
-  get "twitter_call/index"
-  get "twitter_call/get"
-  get "twitter_call/post"
-  get "twitter_call/put"
+  
+  # Query all the APIs for the latest stuff and return an XML file!
+  match 'twitter_call/latest/:id' => 'twitter_call#latest'
+  get "twitter_call/latest"
+  
+  get "twitter_call/test"
+  
+  get "twitter_call/all"
+  
+  get "twitter_call/setup_atom"
   
   resources :twitter_call do
     collection do
-      get 'index'
+      get 'all'
     end
   end
   

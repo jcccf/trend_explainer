@@ -49,7 +49,7 @@ $(function(){
   
   var xml = "";
   var xsl = "";
-  $.ajax({ url: '/xslt/test2.xml', dataType: 'text', success: function(data) {
+  $.ajax({ url: '/twitter_call/all', dataType: 'text', success: function(data) {
   		xml = data;
   		$.ajax({ url: '/xslt/feed.xsl', dataType: 'xml', success: function(data) {
     			xsl = data;
