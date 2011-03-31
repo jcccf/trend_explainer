@@ -7,6 +7,7 @@ TrendExplainer::Application.routes.draw do
   
   get "twitter_call/test"
   
+  match 'twitter_call/all/:id' => 'twitter_call#all'
   get "twitter_call/all"
   
   get "twitter_call/setup_atom"

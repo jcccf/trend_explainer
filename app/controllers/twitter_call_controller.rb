@@ -116,10 +116,15 @@ class TwitterCallController < ApplicationController
   
   # Get all trends
   def all
+    location_id = params[:id]
     url= "http://localhost:8080"
     r = RestClient::Resource.new url
     res = r["exist/atom/content/4302Collection/root-trends"].get
     render :xml => res
+  end
+  
+  def update
+    # Given the ID and Trend_Name and Comment Text, update
   end
 
   def create
