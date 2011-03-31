@@ -80,10 +80,10 @@ class TwitterCallController < ApplicationController
             trends.each_with_index do |t,i|
               xml.trend(:xmlns => "http://api.twitter.com", :topic => t) {
                 xml.top_result(:xmlns => "http://www.bing.com") {
-                  xml.parent.content = result.bing[i]
+                  xml.parent.content = @results[i].bing
                 }
                 xml.abstract(:xmlns => "http://www.wikipedia.org") {
-                  xml.parent.content = result.wikipedia[i]
+                  xml.parent.content = @results[i].wikipedia
                 }
               }
             end
@@ -160,18 +160,14 @@ EOF
     puts res
     render :xml => res
   end
-
-  def put
-    feed_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>rrrrrrrrrrr trends</title><author><name>Justin-Paul-Steven</name></author></feed>'
-    url= "http://localhost:8080"
-    r = RestClient::Resource.new url
-    res = r["exist/atom/edit/4302Collection/fffffffffffff"].put feed_setup, :content_type => "application/atom+xml"
-    puts res
-
-    render :text => res
+  
+  #this function should only be called once for setting up collections and feeds
+  def setup_atom
+    create_collection()
+    create_feed()
   end
 
-  def post_collection
+  def create_collection
     collection_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>Trend Explainer</title></feed>'
     url= "http://localhost:8080/exist/atom/edit/4302Collection"
     r = RestClient::Resource.new url
@@ -179,21 +175,21 @@ EOF
     puts res
   end
 
-  def post_feed
+  def create_feed
     feed_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>Root trends</title><author><name>Justin-Paul-Steven</name></author></feed>'
     url= "http://localhost:8080"
     r = RestClient::Resource.new url
     res = r["exist/atom/edit/4302Collection/root-trends"].post feed_setup, :content_type => "application/atom+xml"
     puts res
   end
-
-  #this function should only be called once for setting up collections and feeds
-  def post_collection_feed
-    post_collection()
-    post_feed()
+  
+  def update_feed
+    feed_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>rrrrrrrrrrr trends</title><author><name>Justin-Paul-Steven</name></author></feed>'
+    url= "http://localhost:8080"
+    r = RestClient::Resource.new url
+    res = r["exist/atom/edit/4302Collection/fffffffffffff"].put feed_setup, :content_type => "application/atom+xml"
+    puts res
+    render :text => res
   end
-
-
-
 
 end
