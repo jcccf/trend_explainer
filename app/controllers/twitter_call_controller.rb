@@ -33,6 +33,7 @@ class TwitterCallController < ApplicationController
     @results = []
 
     @trends.each do |trend|
+      trend = trend.gsub('&',' and ')
       puts trend
       result = Result.new
       result.trend = trend
@@ -52,7 +53,7 @@ class TwitterCallController < ApplicationController
       search_top = search_top_path.content
       search_altered_xpath = search_xml.xpath("/sr:SearchResponse/sr:Query/sr:AlteredQuery",search_ns)
       search_altered = search_altered_xpath.first ? search_altered_xpath.first.content : ""
-      result.bing = search_top 
+      result.bing = search_top
       result.altered_query = search_altered
 
       # Search Wikipedia and get back top search result if any
@@ -145,14 +146,22 @@ class TwitterCallController < ApplicationController
 
     atom_xml = Nokogiri::XML(atom_string)
 
-    # assume the item exists and that there's only one of them
-    topic_node = atom_xml.xpath("//tw:trend[@topic='"+topic+"']", {"tw" => "http://api.twitter.com"})[0]
+    comment_ns = "http://my.superdupertren.ds"
 
-    # Create new node and add
-    new_node = Nokogiri::XML::Node.new("user_comment", atom_xml)
-    new_node.add_namespace(nil,"http://my.superdupertren.ds")
-    new_node.content = user_comment
-    topic_node.add_child(new_node)
+    # assume the item exists and that there's only one of them
+    comment_nodes = atom_xml.xpath("//tw:trend", {"tw" => comment_ns})
+    if (comment_nodes.first?)
+      comment_nodes.first.content = user_comment
+      puts "we found the comment nodes!!!!"
+    else
+      # Find user_comment node first and edit it
+      comment_node = atom_xml.xpath("//tw:trend[@topic='"+topic+"']", {"tw" => "http://api.twitter.com"})[0]
+      # Create new node and add
+      new_node = Nokogiri::XML::Node.new("user_comment", atom_xml)
+      new_node.add_namespace(nil, comment_ns)
+      new_node.content = user_comment
+      topic_node.add_child(new_node)
+    end
 
     #update entry
     puts atom_xml.to_xml
