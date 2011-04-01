@@ -33,6 +33,7 @@ class TwitterCallController < ApplicationController
     @results = []
 
     @trends.each do |trend|
+      puts trend
       trend = trend.gsub('&',' and ')
       puts trend
       result = Result.new
@@ -146,13 +147,14 @@ class TwitterCallController < ApplicationController
     comment_ns = "http://my.superdupertren.ds"
 
     # assume the item exists and that there's only one of them
-    comment_nodes = atom_xml.xpath("//tw:trend", {"tw" => comment_ns})
-    if (comment_nodes.first?)
+    topic_node = atom_xml.xpath("//tw:trend[@topic='"+topic+"']", {"tw" => "http://api.twitter.com"})[0]
+
+    comment_nodes = topic_node.xpath("//tw:user_comment", {"tw" => comment_ns})
+    if (comment_nodes.first)
+      # Find user_comment node first and edit it
       comment_nodes.first.content = user_comment
       puts "we found the comment nodes!!!!"
     else
-      # Find user_comment node first and edit it
-      comment_node = atom_xml.xpath("//tw:trend[@topic='"+topic+"']", {"tw" => "http://api.twitter.com"})[0]
       # Create new node and add
       new_node = Nokogiri::XML::Node.new("user_comment", atom_xml)
       new_node.add_namespace(nil, comment_ns)
