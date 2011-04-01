@@ -3,27 +3,28 @@
 // $.post("/tasks/1",{_method: "PUT",authenticity_token: encodeURIComponent
 // (window._token)});
 
-var trends_id, original_topic;
+var trends_id, original_topic, original_uuid, original_span, xml, xsl;
 
 $(function(){
-  $('#loading_div')
-      .hide()
-      .ajaxStart(function() { $(this).show(); })
-      .ajaxStop(function() { $(this).hide(); });
-      
-  // $('#trends_list li a').live('click', function(){
-  //   event.preventDefault();
-  //   var link = this;
-  //   $.smoothScroll({
-  //     scrollTarget: link.hash
-  //   });
-  // });
+  $('#loading_div').hide()
+    .ajaxStart(function() { $(this).show(); })
+    .ajaxStop(function() { $(this).hide(); });
+  
+  $('#latest_button').click(function(){
+    get_latest();
+  });
       
   $('.user_power').live('click', function(){
+    original_span = $('.user_comment',this);
     var original_text = $('.user_comment',this).html();
     original_topic = $('h2',$(this).parent()).html();
+    original_uuid = $('form input[type=hidden][name=entries_id]',$(this).parent().parent()).attr("value");
     $("#comment").val(original_text);
     $("#dialog-form").dialog({ title: "Modifying comment for "+original_topic }).dialog("open");
+  });
+  
+  $("#locations_dropdown").live('change', function(){
+    get_all();
   });
   
   $( "#dialog-form" ).dialog({
@@ -34,7 +35,8 @@ $(function(){
   			buttons: {
   				"Edit comment": function() {
   				  var new_text = $("#comment").val();
-  				  update_trend(original_topic, new_text);
+  				  original_span.html(new_text);
+  				  update_trend(original_topic, new_text, original_uuid);
   					$( this ).dialog( "close" );
   				},
   				Cancel: function() {
@@ -47,9 +49,33 @@ $(function(){
   		});
   		$("#dialog-form").hide();
   
-  var xml = "";
-  var xsl = "";
-  $.ajax({ url: '/twitter_call/all', dataType: 'text', success: function(data) {
+  get_all();
+  
+  // Get Locations
+  // Instead - https://api.twitter.com/1/trends/available.xml ??
+  $.ajax({ url: '/xslt/locations.xml', dataType: 'text', success: function(data) {
+  		xml2 = data;
+  		$.ajax({ url: '/xslt/locations.xsl', dataType: 'xml', success: function(data) {
+    			xsl2 = data;
+    			// Convert Text into XML
+    			parser2=new DOMParser();
+          xmlDoc2=parser2.parseFromString(xml2,"text/xml");
+    			// Transform XML using XSLT
+    			xsltProcessor2=new XSLTProcessor();
+          xsltProcessor2.importStylesheet(xsl2);
+          resultDocument2 = xsltProcessor2.transformToFragment(xmlDoc2,document);
+          $("#trends_block_form").prepend(resultDocument2);
+    		}
+      });
+  	}
+  });
+  
+  
+  // TODO Fetch latest trends
+});
+
+function get_all(){
+  $.ajax({ url: '/twitter_call/all/'+$("#locations_dropdown").val(), dataType: 'text', success: function(data) {
   		xml = data;
   		$.ajax({ url: '/xslt/feed.xsl', dataType: 'xml', success: function(data) {
     			xsl = data;
@@ -60,15 +86,13 @@ $(function(){
     			xsltProcessor=new XSLTProcessor();
           xsltProcessor.importStylesheet(xsl);
           resultDocument = xsltProcessor.transformToFragment(xmlDoc,document);
-          $("#main_block").html("").append(resultDocument);
+          $("#main_block").html("").prepend(resultDocument);
           build_trends_navigation();
     		}
       });
   	}
   });
-  
-  // TODO Fetch latest trends
-});
+}
 
 function build_trends_navigation(){
   $("ul").html("");
@@ -79,20 +103,32 @@ function build_trends_navigation(){
   $('#trends_list li a').smoothScroll();
 }
 
-function get_trend(trend_id){
-  alert(trend_id);
-  /*$.get("SOMEURL", function(data){
-    xsltProcessor.importStylesheet(xsl);
-    resultDocument = xsltProcessor.transformToFragment(data,document);
-    $("#main_block").html("").append(resultDocument);
-  },"xml");*/
+function get_latest(){
+  alert($("#locations_dropdown").val());
+  $.ajax({ url: '/twitter_call/latest/'+$("#locations_dropdown").val(), dataType: 'text', success: function(data) {
+  		xml = data;
+  		$.ajax({ url: '/xslt/entry.xsl', dataType: 'xml', success: function(data) {
+    			xsl = data;
+    			// Convert Text into XML
+    			parser=new DOMParser();
+          xmlDoc=parser.parseFromString(xml,"text/xml");
+    			// Transform XML using XSLT
+    			xsltProcessor=new XSLTProcessor();
+          xsltProcessor.importStylesheet(xsl);
+          resultDocument = xsltProcessor.transformToFragment(xmlDoc,document);
+          $("#main_block").prepend(resultDocument);
+          build_trends_navigation();
+    		}
+      });
+  	}
+  });
 }
 
-function update_trend(original_topic, updated_text){
-  alert("Original topic was " + original_topic + "\nUpdated text was " + updated_text);
-  /*$.post("SOMEURL", {}, function(data){
-    alert("Success? - "+ data);
-  });*/
+function update_trend(original_topic, updated_text, original_uuid){
+  //alert("Original topic was " + original_topic + "\nUpdated text was " + updated_text + "\nUUID was "+original_uuid);
+  $.post("/twitter_call/update", {uuid: original_uuid, topic: original_topic, comment: updated_text}, function(data){
+    //alert("Returned - "+ data);
+  });
 }
 
 </script>
@@ -100,12 +136,8 @@ function update_trend(original_topic, updated_text){
 <div id="container">
 <div id="trends_block">
   <div style="text-align: center">
-  <form>
-  <select name="location">
-    <option value="0">Global</option>
-    <option value="123">San Francisco</option>
-  </select>
-  <input type="button" value="Hear ye!" />
+  <form id="trends_block_form">
+  <input type="button" id="latest_button" value="Hear ye!" />
   </form>
   </div>
   
@@ -118,16 +150,14 @@ function update_trend(original_topic, updated_text){
 <div id="main_block">
   Loading...please hold on...watch the pretty spinner!
 </div>
+</div>
 
 <!--Utility Divs-->
+<div id="loading_div">waggas
+</div>
+
 <div id="dialog-form" title="Create new user">
 	<form>
 	<textarea name="comment" id="comment" class="text ui-widget-content ui-corner-all" />
 	</form>
-</div>
-
-
-<div id="loading_div">
-</div>
-
 </div>
