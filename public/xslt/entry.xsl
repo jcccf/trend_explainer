@@ -16,9 +16,16 @@
     
     <!--Parse Atom entry-->
     <xsl:template match="a:entry">
-        <h1><xsl:value-of select="a:title"/></h1>
-        <h3>Retrieved on <xsl:value-of select="a:updated"/></h3>
-        <xsl:apply-templates select="tr:trends"/>
+        <div class="entries">
+            <xsl:attribute name="id"><xsl:value-of select="substring(a:id,10)" /></xsl:attribute>
+            <form>
+                <input type="hidden" name="entries_id"><xsl:attribute name="value"><xsl:value-of select="substring(a:id,10)"/></xsl:attribute></input>
+                <input type="hidden" name="entries_url"><xsl:attribute name="value"><xsl:value-of select="a:link[@rel='edit']/@href"/></xsl:attribute></input>
+            </form>
+            <h1><xsl:value-of select="a:title"/></h1>
+            <h3>Retrieved on <xsl:value-of select="a:updated"/></h3>
+            <xsl:apply-templates select="tr:trends"/>
+        </div>
     </xsl:template>
     
     <!--Parse Trendy object-->
@@ -30,10 +37,10 @@
     <!--Parse Trendy trend-->
     <xsl:template match="tw:trend">
         <div class="trend">
-        <h2><xsl:value-of select="@topic"/></h2>
-        <b>Bing says:</b><xsl:value-of select="bi:top_result" /><br />
-        <b>Wikipedia says:</b><xsl:value-of select="wi:abstract" /><br />
-        <div class="user_power"><b>You say:</b><span class="user_comment"><xsl:value-of select="tr:user_comment" /></span></div>
+            <h2><xsl:value-of select="@topic"/></h2>
+            <b>Bing says:</b><xsl:value-of select="bi:top_result" /><br />
+            <b>Wikipedia says:</b><xsl:value-of select="wi:abstract" /><br />
+            <div class="user_power"><b>You say:</b><span class="user_comment"><xsl:value-of select="tr:user_comment" /></span></div>
         </div>
     </xsl:template>
     

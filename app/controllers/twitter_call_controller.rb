@@ -46,10 +46,7 @@ class TwitterCallController < ApplicationController
       puts search_xml
       search_ns = {"xmlns:sr" => "http://schemas.microsoft.com/LiveSearch/2008/04/XML/element", "xmlns:web" => "http://schemas.microsoft.com/LiveSearch/2008/04/XML/web"}
       search_top_path = search_xml.xpath("/sr:SearchResponse/web:Web/web:Results/web:WebResult/web:Description",search_ns).first
-      if not search_top_path
-        next
-      end
-      search_top = search_top_path.content
+      search_top = search_top_path ? search_top_path.content : ""
       search_altered_xpath = search_xml.xpath("/sr:SearchResponse/sr:Query/sr:AlteredQuery",search_ns)
       search_altered = search_altered_xpath.first ? search_altered_xpath.first.content : ""
       result.bing = search_top 
@@ -129,10 +126,10 @@ class TwitterCallController < ApplicationController
     topic = params[:topic]
     comment = params[:comment]
 
-    # to change later
-    uuid = "91de7ee4-1cde-4aa8-9d0e-e16f46236d2f"
-    comment = "this is awesome111111!"
-    topic = "soytanrudo"
+    # # to change later
+    # uuid = "91de7ee4-1cde-4aa8-9d0e-e16f46236d2f"
+    # comment = "this is awesome111111!"
+    # topic = "soytanrudo"
 
     url= "http://localhost:8080"
     get_str = "exist/atom/content/4302Collection/root-trends/?id=urn:uuid:%s"%uuid

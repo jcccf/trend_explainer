@@ -9,8 +9,12 @@
     
     <xsl:output method="html" encoding="UTF-8" indent="yes" />
     
+    <xsl:template match="/">
+        <xsl:apply-templates select="a:feed" />
+    </xsl:template>
+    
     <!--Base-->
-    <xsl:template match="/feed">
+    <xsl:template match="a:feed">
         <xsl:apply-templates select="a:entry" />
     </xsl:template>
     
@@ -41,7 +45,11 @@
             <b>Bing says:</b><xsl:value-of select="bi:top_result" /><br />
             <b>Wikipedia says:</b><xsl:value-of select="wi:abstract" /><br />
             <div class="user_power"><b>You say:</b><span class="user_comment"><xsl:value-of select="tr:user_comment" /></span></div>
+            <!--<xsl:apply-templates select="tr:user_comment" />-->
         </div>
     </xsl:template>
+    
+    <!--<xsl:template match="tr:user_comment">
+    </xsl:template>-->
     
 </xsl:stylesheet>
