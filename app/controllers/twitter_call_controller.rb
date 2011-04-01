@@ -10,6 +10,41 @@ class Result
 end
 
 class TwitterCallController < ApplicationController
+  def from_bing_wiki(trend)
+    puts trend
+    trend = trend.gsub('&','and')
+    puts trend
+    result = Result.new
+    result.trend = trend
+
+    # Search Bing and get back
+    # - Description of top result
+    # - Altered search query if there exists one
+    search_query = trend
+    #search_xml = Nokogiri::XML(open("http://api.search.live.net/xml.aspx?Appid=D922B026428E58D0B1B38C3CB94E227BF6B113BB&query=#{search_query}&sources=web"))
+    search_xml = Nokogiri::XML(open("http://api.search.live.net/xml.aspx?Appid=D922B026428E58D0B1B38C3CB94E227BF6B113BB&query=#{CGI.escape(search_query)}&sources=web"))
+    puts search_xml
+    search_ns = {"xmlns:sr" => "http://schemas.microsoft.com/LiveSearch/2008/04/XML/element", "xmlns:web" => "http://schemas.microsoft.com/LiveSearch/2008/04/XML/web"}
+    search_top_path = search_xml.xpath("/sr:SearchResponse/web:Web/web:Results/web:WebResult/web:Description",search_ns).first
+    search_top = search_top_path ? search_top_path.content : ""
+    search_altered_xpath = search_xml.xpath("/sr:SearchResponse/sr:Query/sr:AlteredQuery",search_ns)
+    search_altered = search_altered_xpath.first ? search_altered_xpath.first.content : ""
+    result.bing = search_top
+    result.altered_query = search_altered
+
+    # Search Wikipedia and get back top search result if any
+    db_query = search_altered == "" ? search_query : search_altered
+    puts db_query
+    db_xml = Nokogiri::XML(open("http://en.wikipedia.org/w/api.php?action=opensearch&search=#{CGI.escape(db_query)}&limit=2&namespace=0&format=xml"))
+    db_ns = {"xmlns:ss" => "http://opensearch.org/searchsuggest2"}
+    db_abstract_xpath = db_xml.xpath("/ss:SearchSuggestion/ss:Section/ss:Item/ss:Description",db_ns)
+    db_abstract = db_abstract_xpath.first ? db_abstract_xpath.first.content : ""
+    result.wikipedia = db_abstract 
+
+    @results << result
+
+  end
+
   def index
 
     # Get the available locations from Twitter
@@ -32,39 +67,14 @@ class TwitterCallController < ApplicationController
     puts @trends
     @results = []
 
+    trend_funcs = []
     @trends.each do |trend|
-      puts trend
-      trend = trend.gsub('&',' and ')
-      puts trend
-      result = Result.new
-      result.trend = trend
+      trend_thread = Thread.new{from_bing_wiki(trend)}
+      trend_funcs.push(trend_thread)
+    end
 
-      # Search Bing and get back
-      # - Description of top result
-      # - Altered search query if there exists one
-      search_query = trend
-      #search_xml = Nokogiri::XML(open("http://api.search.live.net/xml.aspx?Appid=D922B026428E58D0B1B38C3CB94E227BF6B113BB&query=#{search_query}&sources=web"))
-      search_xml = Nokogiri::XML(open("http://api.search.live.net/xml.aspx?Appid=D922B026428E58D0B1B38C3CB94E227BF6B113BB&query=#{CGI.escape(search_query)}&sources=web"))
-      puts search_xml
-      search_ns = {"xmlns:sr" => "http://schemas.microsoft.com/LiveSearch/2008/04/XML/element", "xmlns:web" => "http://schemas.microsoft.com/LiveSearch/2008/04/XML/web"}
-      search_top_path = search_xml.xpath("/sr:SearchResponse/web:Web/web:Results/web:WebResult/web:Description",search_ns).first
-      search_top = search_top_path ? search_top_path.content : ""
-      search_altered_xpath = search_xml.xpath("/sr:SearchResponse/sr:Query/sr:AlteredQuery",search_ns)
-      search_altered = search_altered_xpath.first ? search_altered_xpath.first.content : ""
-      result.bing = search_top
-      result.altered_query = search_altered
-
-      # Search Wikipedia and get back top search result if any
-      db_query = search_altered == "" ? search_query : search_altered
-      puts db_query
-      db_xml = Nokogiri::XML(open("http://en.wikipedia.org/w/api.php?action=opensearch&search=#{CGI.escape(db_query)}&limit=2&namespace=0&format=xml"))
-      db_ns = {"xmlns:ss" => "http://opensearch.org/searchsuggest2"}
-      db_abstract_xpath = db_xml.xpath("/ss:SearchSuggestion/ss:Section/ss:Item/ss:Description",db_ns)
-      db_abstract = db_abstract_xpath.first ? db_abstract_xpath.first.content : ""
-      result.wikipedia = db_abstract 
-
-      @results << result
-
+    trend_funcs.each do |th|
+      th.join
     end
 
     # Output XML
@@ -75,7 +85,7 @@ class TwitterCallController < ApplicationController
             xml.parent.content = "Hello"
           }
 
-          xml.trends(:xmlns => "http://my.superdupertren.ds", :location => "test") {           
+          xml.trends(:xmlns => "http://my.superdupertren.ds", :location => "test") {
             trends.each_with_index do |t,i|
               xml.trend(:xmlns => "http://api.twitter.com", :topic => t) {
                 xml.top_result(:xmlns => "http://www.bing.com") {
