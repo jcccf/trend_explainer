@@ -98,7 +98,7 @@ function build_trends_navigation(){
   $("ul").html("");
   $("div form input[type=hidden][name=entries_id]").each(function(index){
     my_id = $(this).attr("value");
-    $("ul").append("<li><a href=\"#"+my_id+"\">"+my_id+"</a></li>"); 
+    $("ul").append("<li><a href=\"#"+my_id+"\">"+$("h1",$(this).parent().parent()).html()+"</a></li>"); 
   });
   $('#trends_list li a').smoothScroll();
 }
