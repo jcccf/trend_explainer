@@ -168,7 +168,12 @@ class TwitterCallController < ApplicationController
     # assume the item exists and that there's only one of them
     topic_node = atom_xml.xpath("//tw:trend[@topic='"+topic+"']", {"tw" => "http://api.twitter.com"})[0]
 
-    comment_nodes = topic_node.xpath("//tw:user_comment", {"tw" => comment_ns})
+    puts "Topic"
+    puts topic
+    puts "Comment"
+    puts user_comment
+
+    comment_nodes = topic_node.xpath("//tw:trend[@topic='"+topic+"']/cm:user_comment", {"tw" => "http://api.twitter.com", "cm" => comment_ns})
     if (comment_nodes.first)
       # Find user_comment node first and edit it
       comment_nodes.first.content = user_comment

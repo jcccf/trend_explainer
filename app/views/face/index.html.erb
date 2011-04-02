@@ -104,7 +104,7 @@ function build_trends_navigation(){
 }
 
 function get_latest(){
-  alert($("#locations_dropdown").val());
+  //alert($("#locations_dropdown").val());
   $.ajax({ url: '/twitter_call/latest/'+$("#locations_dropdown").val(), dataType: 'text', success: function(data) {
   		xml = data;
   		$.ajax({ url: '/xslt/entry.xsl', dataType: 'xml', success: function(data) {
