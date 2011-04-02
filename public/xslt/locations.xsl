@@ -6,7 +6,7 @@
     
     <xsl:template match="/locations">
         <select name="locations" id="locations_dropdown">
-            <option value="1">Global</option>
+            <option value="1">Worldwide</option>
             <xsl:apply-templates select="location" />
         </select>
     </xsl:template>

@@ -27,14 +27,14 @@
                 <input type="hidden" name="entries_url"><xsl:attribute name="value"><xsl:value-of select="a:link[@rel='edit']/@href"/></xsl:attribute></input>
             </form>
             <h1><xsl:value-of select="a:title"/></h1>
-            <h3>Retrieved on <xsl:value-of select="a:updated"/></h3>
             <xsl:apply-templates select="tr:trends"/>
+            <h4>Retrieved on <xsl:value-of select="a:updated"/> by intelligent robotic life</h4>
         </div>
     </xsl:template>
     
     <!--Parse Trendy object-->
     <xsl:template match="tr:trends">
-        <h3>Trends that are <xsl:value-of select="@location"/></h3>
+        <!--<h3>Trends that are <xsl:value-of select="@location"/></h3>-->
         <xsl:apply-templates select="tw:trend" />
     </xsl:template>
     
