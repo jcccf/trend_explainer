@@ -116,20 +116,22 @@ class TwitterCallController < ApplicationController
     url= "http://localhost:8080"
     r = RestClient::Resource.new url
     # TODO Uncomment when implemented
-    #create_feed(location_id) unless feed_exists?(location_id)
-    #res = r["exist/atom/edit/4302Collection/"+location_id].post trends_xml, :content_type => "application/atom+xml"
-    res = r["exist/atom/edit/4302Collection/root-trends"].post trends_xml, :content_type => "application/atom+xml"
+    create_feed(location_id) unless feed_exists?(location_id)
+    res = r["exist/atom/edit/4302Collection/"+location_id].post trends_xml, :content_type => "application/atom+xml"
+    #res = r["exist/atom/edit/4302Collection/root-trends"].post trends_xml, :content_type => "application/atom+xml"
     render :xml => res
   end
   
   # Get all trends for a specific location
   def all
     location_id = params[:id]
+    location_id ||= "1"
     url= "http://localhost:8080"
     r = RestClient::Resource.new url
     # TODO Uncomment when implemented
-    #res = r["exist/atom/content/4302Collection/location_id"].get
-    res = r["exist/atom/content/4302Collection/root-trends"].get
+    create_feed(location_id) unless feed_exists?(location_id)
+    res = r["exist/atom/content/4302Collection/"+location_id].get
+    #res = r["exist/atom/content/4302Collection/root-trends"].get
     render :xml => res
   end
   
@@ -139,6 +141,7 @@ class TwitterCallController < ApplicationController
     uuid = params[:uuid]
     topic = params[:topic]
     comment = params[:comment]
+    location_id = params[:location_id]
 
     # # to change later
     # uuid = "91de7ee4-1cde-4aa8-9d0e-e16f46236d2f"
@@ -146,7 +149,7 @@ class TwitterCallController < ApplicationController
     # topic = "soytanrudo"
 
     url= "http://localhost:8080"
-    get_str = "exist/atom/content/4302Collection/root-trends/?id=urn:uuid:%s"%uuid
+    get_str = "exist/atom/content/4302Collection/"+location_id+"/?id=urn:uuid:%s"%uuid
     r = RestClient::Resource.new url
     res = r[get_str].get
     #puts res
@@ -184,7 +187,7 @@ class TwitterCallController < ApplicationController
 
     url= "http://localhost:8080"
     r = RestClient::Resource.new url
-    post_str = "exist/atom/edit/4302Collection/root-trends/?id=urn:uuid:%s" % uuid
+    post_str = "exist/atom/edit/4302Collection/"+location_id+"/?id=urn:uuid:%s" % uuid
     res = r[post_str].put atom_xml.to_xml, :content_type => "application/atom+xml"
 
     #puts res
@@ -236,7 +239,7 @@ class TwitterCallController < ApplicationController
     #puts res
   end
 
-  def create_feed
+  def create_feed(feed_name)
     feed_setup = Nokogiri::XML::Builder.new do
       feed(:xmlns => "http://www.w3.org/2005/Atom") {
         title "Root trends"
@@ -249,7 +252,7 @@ class TwitterCallController < ApplicationController
     #feed_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>Root trends</title><author><name>Justin-Paul-Steven</name></author></feed>'
     url= "http://localhost:8080"
     r = RestClient::Resource.new url
-    res = r["exist/atom/edit/4302Collection/root-trends"].post feed_setup.to_xml, :content_type => "application/atom+xml"
+    res = r["exist/atom/edit/4302Collection/"+feed_name].post feed_setup.to_xml, :content_type => "application/atom+xml"
     #puts res
   end
   

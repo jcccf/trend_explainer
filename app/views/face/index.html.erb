@@ -75,7 +75,8 @@ $(function(){
 });
 
 function get_all(){
-  $.ajax({ url: '/twitter_call/all/'+$("#locations_dropdown").val(), dataType: 'text', success: function(data) {
+  lid = $("#locations_dropdown").val() ? $("#locations_dropdown").val() : 1
+  $.ajax({ url: '/twitter_call/all/'+lid, dataType: 'text', success: function(data) {
   		xml = data;
   		$.ajax({ url: '/xslt/feed.xsl', dataType: 'xml', success: function(data) {
     			xsl = data;
@@ -126,7 +127,7 @@ function get_latest(){
 
 function update_trend(original_topic, updated_text, original_uuid){
   //alert("Original topic was " + original_topic + "\nUpdated text was " + updated_text + "\nUUID was "+original_uuid);
-  $.post("/twitter_call/update", {uuid: original_uuid, topic: original_topic, comment: updated_text}, function(data){
+  $.post("/twitter_call/update", {uuid: original_uuid, topic: original_topic, comment: updated_text, location_id: $("#locations_dropdown").val() }, function(data){
     //alert("Returned - "+ data);
   });
 }
