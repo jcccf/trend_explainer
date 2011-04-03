@@ -116,6 +116,7 @@ class TwitterCallController < ApplicationController
     url= "http://localhost:8080"
     r = RestClient::Resource.new url
     # TODO Uncomment when implemented
+    puts "Feed exists? %s" % (feed_exists?(location_id)).to_s
     create_feed(location_id) unless feed_exists?(location_id)
     res = r["exist/atom/edit/4302Collection/"+location_id].post trends_xml, :content_type => "application/atom+xml"
     #res = r["exist/atom/edit/4302Collection/root-trends"].post trends_xml, :content_type => "application/atom+xml"
@@ -212,7 +213,7 @@ class TwitterCallController < ApplicationController
   end
     
   
-  # This function should only be called once for setting up collections and feeds
+  # This function should only be called once for setting up collection
   def setup_atom
     create_collection()
     render :text => "Atom setup!"

@@ -215,11 +215,7 @@ class TwitterCallController < ApplicationController
   # This function should only be called once for setting up collections and feeds
   def setup_atom
     create_collection()
-<<<<<<< HEAD
-    #create_feed()
     render :text => "Atom setup!"
-=======
->>>>>>> d5b94019318b33c0e482b9bd0fcd7daed4b0aa9b
   end
 
   # If you get a 401 Unauthorized Error it means the collection already exists!
