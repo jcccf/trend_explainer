@@ -215,7 +215,6 @@ class TwitterCallController < ApplicationController
   # This function should only be called once for setting up collections and feeds
   def setup_atom
     create_collection()
-    create_feed()
   end
 
   # If you get a 401 Unauthorized Error it means the collection already exists!
