@@ -14,10 +14,6 @@ class TwitterCallController < ApplicationController
   def initialize
     @mutex = Mutex.new
   end
-  
-  def from_bing_wiki(result, trend)
-    
-  end
 
   def index(location_id)
 
@@ -105,7 +101,7 @@ class TwitterCallController < ApplicationController
           }
         }
     end
-    puts @builder.to_xml
+    #puts @builder.to_xml
     @builder.to_xml
 
     # Old Stuff
@@ -118,7 +114,9 @@ class TwitterCallController < ApplicationController
 
   end
   
-  # Get latest trends
+  # Get latest trends at a specific location
+  # Calls multiple APIs, parses the result and posts to eXist, 
+  # finally returning the POSTed XML and trends
   def latest
     location_id = params[:id]
     puts "My Location ID is %s" % [location_id]
@@ -126,21 +124,25 @@ class TwitterCallController < ApplicationController
     trends_xml = index(location_id)
     url= "http://localhost:8080"
     r = RestClient::Resource.new url
-    # TODO Use the location id to post to a specific feed
+    # TODO Uncomment when implemented
+    #create_feed(location_id) unless feed_exists?(location_id)
+    #res = r["exist/atom/edit/4302Collection/"+location_id].post trends_xml, :content_type => "application/atom+xml"
     res = r["exist/atom/edit/4302Collection/root-trends"].post trends_xml, :content_type => "application/atom+xml"
     render :xml => res
   end
   
-  # Get all trends
+  # Get all trends for a specific location
   def all
-    # TODO Use the location id to get from a specific feed
     location_id = params[:id]
     url= "http://localhost:8080"
     r = RestClient::Resource.new url
+    # TODO Uncomment when implemented
+    #res = r["exist/atom/content/4302Collection/location_id"].get
     res = r["exist/atom/content/4302Collection/root-trends"].get
     render :xml => res
   end
   
+  # Update a comment for a specific trend in a specific entry
   def update
     # Given the ID and Trend_Name and Comment Text, update
     uuid = params[:uuid]
@@ -198,28 +200,25 @@ class TwitterCallController < ApplicationController
     render :xml => res
 
   end
-
-  def create
-    xml = <<EOF
-<?xml version="1.0" ?>
-<entry xmlns="http://www.w3.org/2005/Atom">
-<title>My First Entry</title>
-<content type='xhtml'>
-<div xmlns='http://www.w3.org/1999/xhtml'>
-<p>Isn't life grand!?!</p>
-</div>
-</content>
-</entry>
-EOF
-
+  
+  # Tests if a feed exists in the 4302Collection
+  def feed_exists?(feed_name)
     url= "http://localhost:8080"
     r = RestClient::Resource.new url
-    res = r["exist/atom/edit/4302Collection/root-trends"].post entry_xml, :content_type => "application/atom+xml"
-    puts res
-    render :xml => res
+    nses = {"s" => "http://www.w3.org/2007/app", "a" => "http://www.w3.org/2005/Atom"}
+    res = r["exist/atom/introspect/4302Collection/"].get
+    #puts res
+    nxml = Nokogiri::XML(res)
+    feeds = nxml.xpath("//s:collection", nses)
+    #puts feeds.inspect
+    feeds.each do |f|
+      return true if f["href"] == (feeds.first["href"]+"/"+feed_name)
+    end
+    return false
   end
+    
   
-  #this function should only be called once for setting up collections and feeds
+  # This function should only be called once for setting up collections and feeds
   def setup_atom
     create_collection()
     create_feed()
