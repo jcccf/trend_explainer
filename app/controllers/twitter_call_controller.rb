@@ -38,7 +38,7 @@ class TwitterCallController < ApplicationController
       trends << (t.content[0] == "#" ? t.content[1..-1] : t.content) # Remove hash
     end
     @trends = trends
-    puts @trends
+    #puts @trends
     @results = []
 
     trend_funcs = []
@@ -105,17 +105,8 @@ class TwitterCallController < ApplicationController
           }
         }
     end
-    puts @builder.to_xml
+    #puts @builder.to_xml
     @builder.to_xml
-
-    # Old Stuff
-    # # Get the abstract for Blankety Blank from DBPedia
-    # db_xml = Nokogiri::XML(open("http://dbpedia.org/data/Blankety_Blank.rdf"))
-    # # Collect namespaces (spend more time by uncommenting)
-    # #db_ns = db_xml.collect_namespaces()
-    # db_ns = {"xmlns:rdf"=>"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "xmlns:rdfs"=>"http://www.w3.org/2000/01/rdf-schema#", "xmlns:dcterms"=>"http://purl.org/dc/terms/", "xmlns:dbpprop"=>"http://dbpedia.org/property/", "xmlns:dbpedia-owl"=>"http://dbpedia.org/ontology/", "xmlns:foaf"=>"http://xmlns.com/foaf/0.1/", "xmlns:n0pred"=>"http://dbpedia.org/ontology/Work/", "xmlns:owl"=>"http://www.w3.org/2002/07/owl#"}
-    # @abstract = db_xml.xpath("//dbpedia-owl:abstract[@xml:lang='en']",db_ns).first.content
-
   end
   
   # Get latest trends
@@ -156,7 +147,7 @@ class TwitterCallController < ApplicationController
     get_str = "exist/atom/content/4302Collection/root-trends/?id=urn:uuid:%s"%uuid
     r = RestClient::Resource.new url
     res = r[get_str].get
-    puts res
+    #puts res
 
     atom_string = res
     user_comment = comment
@@ -187,14 +178,14 @@ class TwitterCallController < ApplicationController
     end
 
     #update entry
-    puts atom_xml.to_xml
+    #puts atom_xml.to_xml
 
     url= "http://localhost:8080"
     r = RestClient::Resource.new url
     post_str = "exist/atom/edit/4302Collection/root-trends/?id=urn:uuid:%s" % uuid
     res = r[post_str].put atom_xml.to_xml, :content_type => "application/atom+xml"
 
-    puts res
+    #puts res
     render :xml => res
 
   end
@@ -215,7 +206,7 @@ EOF
     url= "http://localhost:8080"
     r = RestClient::Resource.new url
     res = r["exist/atom/edit/4302Collection/root-trends"].post entry_xml, :content_type => "application/atom+xml"
-    puts res
+    #puts res
     render :xml => res
   end
   
@@ -227,28 +218,40 @@ EOF
 
   # If you get a 401 Unauthorized Error it means the collection already exists!
   def create_collection
-    collection_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>Trend Explainer</title></feed>'
+    # Output XML
+    collection_setup = Nokogiri::XML::Builder.new do
+      feed(:xmlns => "http://www.w3.org/2005/Atom") {
+        title "Trend Explainer"
+      }
+    end
+    
+    # collection_setup =
+    #   '<?xml version="1.0" ?>
+    #   <feed xmlns="http://www.w3.org/2005/Atom">
+    #     <title>Trend Explainer</title>
+    #   </feed>'
+      
     url= "http://localhost:8080/exist/atom/edit/4302Collection"
     r = RestClient::Resource.new url
-    res = r.post collection_setup, :content_type => "application/atom+xml"
-    puts res
+    res = r.post collection_setup.to_xml, :content_type => "application/atom+xml"
+    #puts res
   end
 
   def create_feed
-    feed_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>Root trends</title><author><name>Justin-Paul-Steven</name></author></feed>'
+    feed_setup = Nokogiri::XML::Builder.new do
+      feed(:xmlns => "http://www.w3.org/2005/Atom") {
+        title "Root trends"
+        author {
+          name "Justin-Paul-Stephen"
+        }
+      }
+    end
+
+    #feed_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>Root trends</title><author><name>Justin-Paul-Steven</name></author></feed>'
     url= "http://localhost:8080"
     r = RestClient::Resource.new url
-    res = r["exist/atom/edit/4302Collection/root-trends"].post feed_setup, :content_type => "application/atom+xml"
-    puts res
-  end
-  
-  def update_feed
-    feed_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>rrrrrrrrrrr trends</title><author><name>Justin-Paul-Steven</name></author></feed>'
-    url= "http://localhost:8080"
-    r = RestClient::Resource.new url
-    res = r["exist/atom/edit/4302Collection/fffffffffffff"].put feed_setup, :content_type => "application/atom+xml"
-    puts res
-    render :text => res
+    res = r["exist/atom/edit/4302Collection/root-trends"].post feed_setup.to_xml, :content_type => "application/atom+xml"
+    #puts res
   end
   
   def test
