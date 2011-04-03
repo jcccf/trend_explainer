@@ -215,7 +215,6 @@ class TwitterCallController < ApplicationController
   # This function should only be called once for setting up collections and feeds
   def setup_atom
     create_collection()
-    #create_feed()
     render :text => "Atom setup!"
   end
 
