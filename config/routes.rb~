@@ -1,5 +1,23 @@
 TrendExplainer::Application.routes.draw do
-  get "twitter_call/index"
+  get "face/index"
+  
+  # Query all the APIs for the latest stuff and return an XML file!
+  match 'twitter_call/latest/:id' => 'twitter_call#latest'
+  get "twitter_call/latest"
+  
+  get "twitter_call/test"
+  
+  match 'twitter_call/all/:id' => 'twitter_call#all'
+  get "twitter_call/all"
+  
+  get "twitter_call/setup_atom"
+  
+  resources :twitter_call do
+    collection do
+      get 'all'
+    end
+  end
+  
   #match 'twitter_call/index' => 'twitter_call#index'
 
   # The priority is based upon order of creation:
@@ -51,7 +69,7 @@ TrendExplainer::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  # root :to => "welcome#index"
+  root :to => "Face#index"
 
   # See how all your routes lay out with "rake routes"
 

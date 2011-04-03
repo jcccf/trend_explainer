@@ -4,13 +4,18 @@ require 'nokogiri'
 require 'net/http'
 require 'uri'
 require 'rest_client'
+require 'thread'
 
 class Result
   attr_accessor :bing, :wikipedia, :altered_query, :trend
 end
 
 class TwitterCallController < ApplicationController
-  def index
+  def initialize
+    @mutex = Mutex.new
+  end
+
+  def index(location_id)
 
     # Get the available locations from Twitter
     locations = {}
@@ -24,130 +29,238 @@ class TwitterCallController < ApplicationController
 
     # Get the trending topics and put them into an array
     trends = []
-    twitter_xml = Nokogiri::XML(open("http://api.twitter.com/1/trends/1.xml"))
+    twitter_xml = Nokogiri::XML(open("http://api.twitter.com/1/trends/"+location_id.to_s+".xml"))
     twitter_xml.xpath("//trend").each do |t|
       trends << (t.content[0] == "#" ? t.content[1..-1] : t.content) # Remove hash
     end
     @trends = trends
-    puts @trends
+    #puts @trends
     @results = []
 
+    trend_funcs = []
     @trends.each do |trend|
-      puts trend
-      result = Result.new
-      result.trend = trend
+      trend_funcs << Thread.new(trend, Result.new) do |trend,result|
+        trend = trend.gsub('&','and')
+        result.trend = trend
+        # Search Bing and get back
+        # - Description of top result
+        # - Altered search query if there exists one
+        search_query = trend
+        #search_xml = Nokogiri::XML(open("http://api.search.live.net/xml.aspx?Appid=D922B026428E58D0B1B38C3CB94E227BF6B113BB&query=#{search_query}&sources=web"))
+        search_xml = Nokogiri::XML(open("http://api.search.live.net/xml.aspx?Appid=D922B026428E58D0B1B38C3CB94E227BF6B113BB&query=#{CGI.escape(search_query)}&sources=web"))
+        #puts search_xml
+        search_ns = {"xmlns:sr" => "http://schemas.microsoft.com/LiveSearch/2008/04/XML/element", "xmlns:web" => "http://schemas.microsoft.com/LiveSearch/2008/04/XML/web"}
+        search_top_path = search_xml.xpath("/sr:SearchResponse/web:Web/web:Results/web:WebResult/web:Description",search_ns).first
+        search_top = search_top_path ? search_top_path.content : ""
+        search_altered_xpath = search_xml.xpath("/sr:SearchResponse/sr:Query/sr:AlteredQuery",search_ns)
+        search_altered = search_altered_xpath.first ? search_altered_xpath.first.content : ""
+        result.bing = search_top
+        result.altered_query = search_altered
 
-      # Search Bing and get back
-      # - Description of top result
-      # - Altered search query if there exists one
-      search_query = trend
-      #search_xml = Nokogiri::XML(open("http://api.search.live.net/xml.aspx?Appid=D922B026428E58D0B1B38C3CB94E227BF6B113BB&query=#{search_query}&sources=web"))
-      search_xml = Nokogiri::XML(open("http://api.search.live.net/xml.aspx?Appid=D922B026428E58D0B1B38C3CB94E227BF6B113BB&query=#{CGI.escape(search_query)}&sources=web"))
-      puts search_xml
-      search_ns = {"xmlns:sr" => "http://schemas.microsoft.com/LiveSearch/2008/04/XML/element", "xmlns:web" => "http://schemas.microsoft.com/LiveSearch/2008/04/XML/web"}
-      search_top_path = search_xml.xpath("/sr:SearchResponse/web:Web/web:Results/web:WebResult/web:Description",search_ns).first
-      if not search_top_path
-        next
+        # Search Wikipedia and get back top search result if any
+        db_query = search_altered == "" ? search_query : search_altered
+        #puts db_query
+        db_xml = Nokogiri::XML(open("http://en.wikipedia.org/w/api.php?action=opensearch&search=#{CGI.escape(db_query)}&limit=2&namespace=0&format=xml"))
+        db_ns = {"xmlns:ss" => "http://opensearch.org/searchsuggest2"}
+        db_abstract_xpath = db_xml.xpath("/ss:SearchSuggestion/ss:Section/ss:Item/ss:Description",db_ns)
+        db_abstract = db_abstract_xpath.first ? db_abstract_xpath.first.content : ""
+        result.wikipedia = db_abstract 
+
+        puts "Inspecting Result Result"
+        #puts result.inspect
+
+        @mutex.synchronize do
+          @results << result
+        end
       end
-      search_top = search_top_path.content
-      search_altered_xpath = search_xml.xpath("/sr:SearchResponse/sr:Query/sr:AlteredQuery",search_ns)
-      search_altered = search_altered_xpath.first ? search_altered_xpath.first.content : ""
-      result.bing = search_top 
-      result.altered_query = search_altered
-
-      # Search Wikipedia and get back top search result if any
-      db_query = search_altered == "" ? search_query : search_altered
-      puts db_query
-      db_xml = Nokogiri::XML(open("http://en.wikipedia.org/w/api.php?action=opensearch&search=#{CGI.escape(db_query)}&limit=2&namespace=0&format=xml"))
-      db_ns = {"xmlns:ss" => "http://opensearch.org/searchsuggest2"}
-      db_abstract_xpath = db_xml.xpath("/ss:SearchSuggestion/ss:Section/ss:Item/ss:Description",db_ns)
-      db_abstract = db_abstract_xpath.first ? db_abstract_xpath.first.content : ""
-      result.wikipedia = db_abstract 
-
-      @results << result
-
     end
+
+    trend_funcs.each { |th| th.join }
+    
+    #puts @results.inspect
 
     # Output XML
     @builder = Nokogiri::XML::Builder.new do |xml|
-        xml.entry {
-          xml.parent.default_namespace = "http://www.w3.org/2005/Atom"
-          xml.title "Radio Head"
-          xml.content("type"=>"xhtml") {
+        xml.entry(:xmlns => "http://www.w3.org/2005/Atom") {
+          xml.title Time.now.strftime("%a %m/%d at %I.%M%p, ") + @locations[location_id]
+          xml.content(:type => "xhtml") {
             xml.parent.content = "Hello"
+          }
+
+          xml.trends(:xmlns => "http://my.superdupertren.ds", :location => @locations[location_id]) {
+            @results.each do |r|
+              xml.trend(:xmlns => "http://api.twitter.com", :topic => r.trend) {
+                xml.top_result(:xmlns => "http://www.bing.com") {
+                  xml.parent.content = r.bing
+                }
+                xml.abstract(:xmlns => "http://www.wikipedia.org") {
+                  xml.parent.content = r.wikipedia
+                }
+              }
+            end
           }
         }
     end
     #puts @builder.to_xml
-
-    # Old Stuff
-    # # Get the abstract for Blankety Blank from DBPedia
-    # db_xml = Nokogiri::XML(open("http://dbpedia.org/data/Blankety_Blank.rdf"))
-    # # Collect namespaces (spend more time by uncommenting)
-    # #db_ns = db_xml.collect_namespaces()
-    # db_ns = {"xmlns:rdf"=>"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "xmlns:rdfs"=>"http://www.w3.org/2000/01/rdf-schema#", "xmlns:dcterms"=>"http://purl.org/dc/terms/", "xmlns:dbpprop"=>"http://dbpedia.org/property/", "xmlns:dbpedia-owl"=>"http://dbpedia.org/ontology/", "xmlns:foaf"=>"http://xmlns.com/foaf/0.1/", "xmlns:n0pred"=>"http://dbpedia.org/ontology/Work/", "xmlns:owl"=>"http://www.w3.org/2002/07/owl#"}
-    # @abstract = db_xml.xpath("//dbpedia-owl:abstract[@xml:lang='en']",db_ns).first.content
-
+    @builder.to_xml
   end
 
-  def get
-    url_str = "http://localhost:8080/exist/atom/introspect/4302Collection/"
-    res = RestClient.get url_str
-    render :xml => res.body
+  # Get latest trends at a specific location
+  # Calls multiple APIs, parses the result and posts to eXist, 
+  # finally returning the POSTed XML and trends
+  def latest
+    location_id = params[:id]
+    puts "My Location ID is %s" % [location_id]
 
+    trends_xml = index(location_id)
+    url= "http://localhost:8080"
+    r = RestClient::Resource.new url
+    # TODO Uncomment when implemented
+    create_feed(location_id) unless feed_exists?(location_id)
+    res = r["exist/atom/edit/4302Collection/"+location_id].post trends_xml, :content_type => "application/atom+xml"
+    #res = r["exist/atom/edit/4302Collection/root-trends"].post trends_xml, :content_type => "application/atom+xml"
+    render :xml => res
   end
 
-  def post_f
-    feed_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>Root trends</title><author><name>Justin-Paul-Steven</name></author></feed>'
-    url= "/exist/atom/edit/4302Collection/root-trends"
-    url_str = "localhost:8080/exist/atom/edit/4302Collection/root-trends"
-    res = Net::HTTP.post_form(URI.parse(url_str), feed_setup,
-                          {'content-type' => 'text/xml'})
-    puts res.body
+  # Get all trends for a specific location
+  def all
+    location_id = params[:id]
+    location_id ||= "1"
+    url= "http://localhost:8080"
+    r = RestClient::Resource.new url
+    # TODO Uncomment when implemented
+    create_feed(location_id) unless feed_exists?(location_id)
+    res = r["exist/atom/content/4302Collection/"+location_id].get
+    #res = r["exist/atom/content/4302Collection/root-trends"].get
+    render :xml => res
+  end
+  
+  # Update a comment for a specific trend in a specific entry
+  def update
+    # Given the ID and Trend_Name and Comment Text, update
+    uuid = params[:uuid]
+    topic = params[:topic]
+    comment = params[:comment]
+    location_id = params[:location_id]
+
+    # # to change later
+    # uuid = "91de7ee4-1cde-4aa8-9d0e-e16f46236d2f"
+    # comment = "this is awesome111111!"
+    # topic = "soytanrudo"
+
+    url= "http://localhost:8080"
+    get_str = "exist/atom/content/4302Collection/"+location_id+"/?id=urn:uuid:%s"%uuid
+    r = RestClient::Resource.new url
+    res = r[get_str].get
+    #puts res
+
+    atom_string = res
+    user_comment = comment
+
+    atom_xml = Nokogiri::XML(atom_string)
+
+    comment_ns = "http://my.superdupertren.ds"
+
+    # assume the item exists and that there's only one of them
+    topic_node = atom_xml.xpath("//tw:trend[@topic='"+topic+"']", {"tw" => "http://api.twitter.com"})[0]
+
+    puts "Topic"
+    puts topic
+    puts "Comment"
+    puts user_comment
+
+    comment_nodes = topic_node.xpath("//tw:trend[@topic='"+topic+"']/cm:user_comment", {"tw" => "http://api.twitter.com", "cm" => comment_ns})
+    if (comment_nodes.first)
+      # Find user_comment node first and edit it
+      comment_nodes.first.content = user_comment
+      puts "we found the comment nodes!!!!"
+    else
+      # Create new node and add
+      new_node = Nokogiri::XML::Node.new("user_comment", atom_xml)
+      new_node.add_namespace(nil, comment_ns)
+      new_node.content = user_comment
+      topic_node.add_child(new_node)
+    end
+
+    #update entry
+    #puts atom_xml.to_xml
+
+    url= "http://localhost:8080"
+    r = RestClient::Resource.new url
+    post_str = "exist/atom/edit/4302Collection/"+location_id+"/?id=urn:uuid:%s" % uuid
+    res = r[post_str].put atom_xml.to_xml, :content_type => "application/atom+xml"
+
+    #puts res
+    render :xml => res
+
+  end
+  
+  # Tests if a feed exists in the 4302Collection
+  def feed_exists?(feed_name)
+    url= "http://localhost:8080"
+    r = RestClient::Resource.new url
+    nses = {"s" => "http://www.w3.org/2007/app", "a" => "http://www.w3.org/2005/Atom"}
+    res = r["exist/atom/introspect/4302Collection/"].get
+    #puts res
+    nxml = Nokogiri::XML(res)
+    feeds = nxml.xpath("//s:collection", nses)
+    #puts feeds.inspect
+    feeds.each do |f|
+      return true if f["href"] == (feeds.first["href"]+"/"+feed_name)
+    end
+    return false
+  end
+    
+  
+  # This function should only be called once for setting up collections and feeds
+  def setup_atom
+    create_collection()
+    #create_feed()
   end
 
-  def post_collection
-    collection_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>Trend Explainer</title></feed>'
+  # If you get a 401 Unauthorized Error it means the collection already exists!
+  def create_collection
+    # Output XML
+    collection_setup = Nokogiri::XML::Builder.new do
+      feed(:xmlns => "http://www.w3.org/2005/Atom") {
+        title "Trend Explainer"
+      }
+    end
+
+    # collection_setup =
+    #   '<?xml version="1.0" ?>
+    #   <feed xmlns="http://www.w3.org/2005/Atom">
+    #     <title>Trend Explainer</title>
+    #   </feed>'
+
     url= "http://localhost:8080/exist/atom/edit/4302Collection"
     r = RestClient::Resource.new url
-    r.post collection_setup, :content_type => "application/atom+xml"
+    res = r.post collection_setup.to_xml, :content_type => "application/atom+xml"
+    puts res
   end
 
-  def post_feed
-    feed_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>Root trends</title><author><name>Justin-Paul-Steven</name></author></feed>'
+  def create_feed(feed_name)
+    feed_setup = Nokogiri::XML::Builder.new do
+      feed(:xmlns => "http://www.w3.org/2005/Atom") {
+        title "Root trends"
+        author {
+          name "Justin-Paul-Stephen"
+        }
+      }
+    end
+
+    #feed_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>Root trends</title><author><name>Justin-Paul-Steven</name></author></feed>'
     url= "http://localhost:8080"
     r = RestClient::Resource.new url
-    r["exist/atom/edit/4302Collection/root-trends"].post feed_setup, :content_type => "application/atom+xml"
-    puts r.to_s
+    res = r["exist/atom/edit/4302Collection/"+feed_name].post feed_setup.to_xml, :content_type => "application/atom+xml"
+    #puts res
   end
-
-  #this function should only be called once for setting up collections and feeds
-  def post_collection_feed
-    post_collection()
-    post_feed()
-    return
-  end
-
-  def post_entry(entry_xml)
-    url= "http://localhost:8080"
-    r = RestClient::Resource.new url
-    r["exist/atom/edit/4302Collection/root-trends"].post entry_xml, :content_type => "application/atom+xml"
-    puts r.to_s
-  end
-
-
-  def put
-    feed_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>rrrrrrrrrrr trends</title><author><name>Justin-Paul-Steven</name></author></feed>'
-    url= "http://localhost:8080"
-    r = RestClient::Resource.new url
-    #res = RestClient.post url, collection_setup, :content_type => "text/xml"
-    r["exist/atom/edit/4302Collection/fffffffffffff"].put feed_setup, :content_type => "application/atom+xml"
-    puts r.to_s
+  
+  def test
+    url_str = "http://localhost:8080/exist/atom/introspect/4302Collection"
+    res = RestClient.get url_str
+    render :xml => res
     #return res.body
-
-    render :text => r.to_s
   end
-
-
 
 end

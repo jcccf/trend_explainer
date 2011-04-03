@@ -1,43 +1,85 @@
-<atom:feed xmlns:atom="http://www.w3.org/2005/Atom"><id xmlns="http://www.w3.org/2005/Atom">urn:uuid:390cdf39-f5eb-428a-8ca7-0f86e4e76d6b</id><updated xmlns="http://www.w3.org/2005/Atom">2011-04-02T21:38:27-04:00</updated><title xmlns="http://www.w3.org/2005/Atom">Root trends</title><author xmlns="http://www.w3.org/2005/Atom"><name>Justin-Paul-Stephen</name></author><link xmlns="http://www.w3.org/2005/Atom" href="#" rel="edit" type="application/atom+xml"/><link xmlns="http://www.w3.org/2005/Atom" href="#" rel="self" type="application/atom+xml"/><entry xmlns="http://www.w3.org/2005/Atom"><id>urn:uuid:1f79d496-aaf4-4a5a-ba22-e2f422e09ec6</id><updated>2011-04-02T21:38:27-04:00</updated><published>2011-04-02T21:37:56-04:00</published><link href="?id=urn:uuid:1f79d496-aaf4-4a5a-ba22-e2f422e09ec6" rel="edit" type="application/atom+xml"/><title>Sat 04/02 at 09.37PM, Worldwide</title><content type="xhtml">Hello</content><trends xmlns="http://my.superdupertren.ds" location="Worldwide">
-    <trend xmlns="http://api.twitter.com" topic="notetofemales">
-      <top_result xmlns="http://www.bing.com">TwitLonger is a simple service that lets you post those tricky messages that really do need more than 140 characters and send them to Twitter</top_result>
-      <abstract xmlns="http://www.wikipedia.org"/>
-      <user_comment xmlns="http://my.superdupertren.ds">Hey</user_comment>
-    </trend>
-    <trend xmlns="http://api.twitter.com" topic="thingsthatpissmeoff">
-      <top_result xmlns="http://www.bing.com">10 Things That Piss Me Off: 1. People who point at their wrist while asking for the time. I know where my watch is, buddy...where the hell is yours?</top_result>
-      <abstract xmlns="http://www.wikipedia.org"/>
-    </trend>
-    <trend xmlns="http://api.twitter.com" topic="sincewebeinghonest">
-      <top_result xmlns="http://www.bing.com">chyna (misschynarock) is on Twitter. Sign up for Twitter to follow chyna (misschynarock) and get their latest updates</top_result>
-      <abstract xmlns="http://www.wikipedia.org"/>
-    </trend>
-    <trend xmlns="http://api.twitter.com" topic="Spice World">
-      <top_result xmlns="http://www.bing.com">Spice World offers the best in fresh garlic and spices. Learn about easy and quick recipes for healthy foods. Browse to learn about garlic facts and benefits.</top_result>
-      <abstract xmlns="http://www.wikipedia.org">Spice World may refer to:</abstract>
-    </trend>
-    <trend xmlns="http://api.twitter.com" topic="Favorite Movie Actress">
-      <top_result xmlns="http://www.bing.com">Vote now for 2011 Nick Kids' Choice Awards! Watch your favorite nominees &amp; winners on Nickelodeon April 2nd at 8pm.</top_result>
-      <abstract xmlns="http://www.wikipedia.org"/>
-    </trend>
-    <trend xmlns="http://api.twitter.com" topic="Frankie Jonas">
-      <top_result xmlns="http://www.bing.com">Franklin Nathaniel "Frankie" Jonas (born September 28, 2000) is an American actor, who has a recurring role on the Disney Channel sitcom, Jonas L.A..</top_result>
-      <abstract xmlns="http://www.wikipedia.org">Franklin Nathaniel "Frankie" Jonas (born September 28, 2000) is an American actor, who has a recurring role on the Disney Channel sitcom, Jonas L.A.. </abstract>
-    </trend>
-    <trend xmlns="http://api.twitter.com" topic="Dylan Sprouse">
-      <top_result xmlns="http://www.bing.com">Dylan Thomas Sprouse and Cole Mitchell Sprouse (born August 4, 1992) are American actors. They are twins and are collectively referred to as Dylan and Cole Sprouse or the ... </top_result>
-      <abstract xmlns="http://www.wikipedia.org">Dylan Thomas Sprouse and Cole Mitchell Sprouse (born August 4, 1990) are American actors. </abstract>
-    </trend>
-    <trend xmlns="http://api.twitter.com" topic="Mentirita Fresca">
-      <top_result xmlns="http://www.bing.com">TwitLonger is a simple service that lets you post those tricky messages that really do need more than 140 characters and send them to Twitter</top_result>
-      <abstract xmlns="http://www.wikipedia.org"/>
-    </trend>
-    <trend xmlns="http://api.twitter.com" topic="MILEY WON">
-      <top_result xmlns="http://www.bing.com">We've been saving this one for just the right time to unleash this geniusity. Now is the time! We commissioned our brilliant animator, Michael Mouris, with m...</top_result>
-      <abstract xmlns="http://www.wikipedia.org"/>
-    </trend>
-    <trend xmlns="http://api.twitter.com" topic="Keke Palmer">
-      <top_result xmlns="http://www.bing.com">Lauren Keyana " Keke" Palmer (born August 26, 1993) is an American actress and singer who rose to fame for her performance in the 2006 film Akeelah and the Bee She ...</top_result>
-      <abstract xmlns="http://www.wikipedia.org">Lauren Keyana "Keke" Palmer (born August 26, 1993) is an American actress and singer who rose to fame for her performance in the 2006 film Akeelah and the Bee. </abstract>
-    </trend>
-  </trends></entry></atom:feed>
+<atom:feed xmlns:atom="http://www.w3.org/2005/Atom">
+  <id xmlns="http://www.w3.org/2005/Atom">urn:uuid:390cdf39-f5eb-428a-8ca7-0f86e4e76d6b</id>
+  <updated xmlns="http://www.w3.org/2005/Atom">2011-04-02T21:38:27-04:00</updated>
+  <title xmlns="http://www.w3.org/2005/Atom">Root trends</title>
+  <author xmlns="http://www.w3.org/2005/Atom">
+    <name>Justin-Paul-Stephen</name>
+  </author>
+  <link xmlns="http://www.w3.org/2005/Atom" href="#" rel="edit" type="application/atom+xml"/>
+  <link xmlns="http://www.w3.org/2005/Atom" href="#" rel="self" type="application/atom+xml"/>
+  <entry xmlns="http://www.w3.org/2005/Atom">
+    <id>urn:uuid:1f79d496-aaf4-4a5a-ba22-e2f422e09ec6</id>
+    <updated>2011-04-02T21:38:27-04:00</updated>
+    <published>2011-04-02T21:37:56-04:00</published>
+    <link href="?id=urn:uuid:1f79d496-aaf4-4a5a-ba22-e2f422e09ec6" rel="edit"
+      type="application/atom+xml"/>
+    <title>Sat 04/02 at 09.37PM, Worldwide</title>
+
+    <trends xmlns="http://my.superdupertren.ds" location="Worldwide">
+      <trend xmlns="http://api.twitter.com" topic="notetofemales">
+        <top_result xmlns="http://www.bing.com">TwitLonger is a simple service that lets you post
+          those tricky messages that really do need more than 140 characters and send them to
+          Twitter</top_result>
+        <abstract xmlns="http://www.wikipedia.org"/>
+        <user_comment xmlns="http://my.superdupertren.ds">Hey</user_comment>
+      </trend>
+      <trend xmlns="http://api.twitter.com" topic="thingsthatpissmeoff">
+        <top_result xmlns="http://www.bing.com">10 Things That Piss Me Off: 1. People who point at
+          their wrist while asking for the time. I know where my watch is, buddy...where the hell is
+          yours?</top_result>
+        <abstract xmlns="http://www.wikipedia.org"/>
+      </trend>
+      <trend xmlns="http://api.twitter.com" topic="sincewebeinghonest">
+        <top_result xmlns="http://www.bing.com">chyna (misschynarock) is on Twitter. Sign up for
+          Twitter to follow chyna (misschynarock) and get their latest updates</top_result>
+        <abstract xmlns="http://www.wikipedia.org"/>
+      </trend>
+      <trend xmlns="http://api.twitter.com" topic="Spice World">
+        <top_result xmlns="http://www.bing.com">Spice World offers the best in fresh garlic and
+          spices. Learn about easy and quick recipes for healthy foods. Browse to learn about garlic
+          facts and benefits.</top_result>
+        <abstract xmlns="http://www.wikipedia.org">Spice World may refer to:</abstract>
+      </trend>
+      <trend xmlns="http://api.twitter.com" topic="Favorite Movie Actress">
+        <top_result xmlns="http://www.bing.com">Vote now for 2011 Nick Kids' Choice Awards! Watch
+          your favorite nominees &amp; winners on Nickelodeon April 2nd at 8pm.</top_result>
+        <abstract xmlns="http://www.wikipedia.org"/>
+      </trend>
+      <trend xmlns="http://api.twitter.com" topic="Frankie Jonas">
+        <top_result xmlns="http://www.bing.com">Franklin Nathaniel "Frankie" Jonas (born September
+          28, 2000) is an American actor, who has a recurring role on the Disney Channel sitcom,
+          Jonas L.A..</top_result>
+        <abstract xmlns="http://www.wikipedia.org">Franklin Nathaniel "Frankie" Jonas (born
+          September 28, 2000) is an American actor, who has a recurring role on the Disney Channel
+          sitcom, Jonas L.A.. </abstract>
+      </trend>
+      <trend xmlns="http://api.twitter.com" topic="Dylan Sprouse">
+        <top_result xmlns="http://www.bing.com">Dylan Thomas Sprouse and Cole Mitchell Sprouse (born
+          August 4, 1992) are American actors. They are twins and are collectively referred to as
+          Dylan and Cole Sprouse or the ... </top_result>
+        <abstract xmlns="http://www.wikipedia.org">Dylan Thomas Sprouse and Cole Mitchell Sprouse
+          (born August 4, 1990) are American actors. </abstract>
+      </trend>
+      <trend xmlns="http://api.twitter.com" topic="Mentirita Fresca">
+        <top_result xmlns="http://www.bing.com">TwitLonger is a simple service that lets you post
+          those tricky messages that really do need more than 140 characters and send them to
+          Twitter</top_result>
+        <abstract xmlns="http://www.wikipedia.org"/>
+      </trend>
+      <trend xmlns="http://api.twitter.com" topic="MILEY WON">
+        <top_result xmlns="http://www.bing.com">We've been saving this one for just the right time
+          to unleash this geniusity. Now is the time! We commissioned our brilliant animator,
+          Michael Mouris, with m...</top_result>
+        <abstract xmlns="http://www.wikipedia.org"/>
+      </trend>
+      <trend xmlns="http://api.twitter.com" topic="Keke Palmer">
+        <top_result xmlns="http://www.bing.com">Lauren Keyana " Keke" Palmer (born August 26, 1993)
+          is an American actress and singer who rose to fame for her performance in the 2006 film
+          Akeelah and the Bee She ...</top_result>
+        <abstract xmlns="http://www.wikipedia.org">Lauren Keyana "Keke" Palmer (born August 26,
+          1993) is an American actress and singer who rose to fame for her performance in the 2006
+          film Akeelah and the Bee. </abstract>
+      </trend>
+    </trends>
+  </entry>
+</atom:feed>

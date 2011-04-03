@@ -83,9 +83,9 @@ class TwitterCallController < ApplicationController
     @builder = Nokogiri::XML::Builder.new do |xml|
         xml.entry(:xmlns => "http://www.w3.org/2005/Atom") {
           xml.title Time.now.strftime("%a %m/%d at %I.%M%p, ") + @locations[location_id]
-          xml.content(:type => "xhtml") {
-            xml.parent.content = "Hello"
-          }
+          #xml.content(:type => "xhtml") {
+          #  xml.parent.content = "Hello"
+          #}
 
           xml.trends(:xmlns => "http://my.superdupertren.ds", :location => @locations[location_id]) {
             @results.each do |r|
@@ -104,14 +104,14 @@ class TwitterCallController < ApplicationController
     #puts @builder.to_xml
     @builder.to_xml
   end
-  
+
   # Get latest trends at a specific location
   # Calls multiple APIs, parses the result and posts to eXist, 
   # finally returning the POSTed XML and trends
   def latest
     location_id = params[:id]
     puts "My Location ID is %s" % [location_id]
-    
+
     trends_xml = index(location_id)
     url= "http://localhost:8080"
     r = RestClient::Resource.new url
@@ -121,7 +121,7 @@ class TwitterCallController < ApplicationController
     #res = r["exist/atom/edit/4302Collection/root-trends"].post trends_xml, :content_type => "application/atom+xml"
     render :xml => res
   end
-  
+
   # Get all trends for a specific location
   def all
     location_id = params[:id]
@@ -215,7 +215,8 @@ class TwitterCallController < ApplicationController
   # This function should only be called once for setting up collections and feeds
   def setup_atom
     create_collection()
-    create_feed()
+    #create_feed()
+    render :text => "Atom setup!"
   end
 
   # If you get a 401 Unauthorized Error it means the collection already exists!
@@ -226,17 +227,17 @@ class TwitterCallController < ApplicationController
         title "Trend Explainer"
       }
     end
-    
+
     # collection_setup =
     #   '<?xml version="1.0" ?>
     #   <feed xmlns="http://www.w3.org/2005/Atom">
     #     <title>Trend Explainer</title>
     #   </feed>'
-      
+
     url= "http://localhost:8080/exist/atom/edit/4302Collection"
     r = RestClient::Resource.new url
     res = r.post collection_setup.to_xml, :content_type => "application/atom+xml"
-    #puts res
+    puts res
   end
 
   def create_feed(feed_name)
