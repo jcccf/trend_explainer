@@ -202,12 +202,14 @@ class TwitterCallController < ApplicationController
     r = RestClient::Resource.new url
     nses = {"s" => "http://www.w3.org/2007/app", "a" => "http://www.w3.org/2005/Atom"}
     res = r["exist/atom/introspect/4302Collection/"].get
-    #puts res
+    puts res
     nxml = Nokogiri::XML(res)
     feeds = nxml.xpath("//s:collection", nses)
     #puts feeds.inspect
     feeds.each do |f|
-      return true if f["href"] == (feeds.first["href"]+"/"+feed_name)
+      puts f["href"]
+      url = "/atom/edit/4302Collection/"
+      return true if f["href"] == (url+feed_name)
     end
     return false
   end
@@ -249,7 +251,7 @@ class TwitterCallController < ApplicationController
         }
       }
     end
-
+    puts feed_setup.to_xml
     #feed_setup = '<?xml version="1.0" ?><feed xmlns="http://www.w3.org/2005/Atom"><title>Root trends</title><author><name>Justin-Paul-Steven</name></author></feed>'
     url= "http://localhost:8080"
     r = RestClient::Resource.new url
