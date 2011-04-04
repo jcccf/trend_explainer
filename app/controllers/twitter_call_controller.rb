@@ -233,10 +233,10 @@ class TwitterCallController < ApplicationController
     #   <feed xmlns="http://www.w3.org/2005/Atom">
     #     <title>Trend Explainer</title>
     #   </feed>'
-
-    url= "http://localhost:8080/exist/atom/edit/4302Collection"
+    puts collection_setup.to_xml
+    url= "http://localhost:8080"
     r = RestClient::Resource.new url
-    res = r.post collection_setup.to_xml, :content_type => "application/atom+xml"
+    res = r["exist/atom/edit/4302Collection"].post collection_setup.to_xml, :content_type => "application/atom+xml"
     puts res
   end
 
